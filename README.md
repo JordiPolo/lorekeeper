@@ -49,17 +49,17 @@ logger.warning("This is another message")
 
 Will output:
 ```json
-{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", 'role' => 'backend' }
-{ "message": "This is another message", "timestamp": "1970-01-01T00:00:00.000+0100", 'role' => 'backend' }
+{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", "role": "backend" }
+{ "message": "This is another message", "timestamp": "1970-01-01T00:00:00.000+0100", "role": "backend" }
 ```
 
 Because of speed purposes the JSON dumping is done as simply as possible. If you provide a hash of keys like:
-```
+```ruby
 { key: 'value' }
 ```
 The output will include:
-```
-{ ':key': 'value' }
+```json
+{ ":key": "value" }
 ```
 
 
@@ -74,7 +74,7 @@ logger.error_with_data('message', {data1: 'Extra data', data2: 'Extra data2'})
 
 Will output:
 ```json
-{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", 'data': {data1: 'Extra data', data2: 'Extra data2'} }
+{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", "data": {"data1": "Extra data", "data2": "Extra data2"} }
 ```
 
 
