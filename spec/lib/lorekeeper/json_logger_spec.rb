@@ -4,21 +4,10 @@ require 'json'
 RSpec.describe Lorekeeper do
   describe Lorekeeper::JSONLogger do
 
-    class FakeIO
-      def close
-      end
-      def write(msg)
-        @msg = msg
-      end
-      def received_message
-        @msg && JSON.parse(@msg)
-      end
-    end
-
-    let(:io) {FakeIO.new}
-    let(:current_time) {Time.mktime(1897,1,1)}
-    let(:time_string) { '1897-01-01T00:00:00.000+0100' }
-    let(:message) { "This is a message" }
+    let(:io) { FakeJSONIO.new }
+    let(:current_time) { Time.utc(1897,1,1) }
+    let(:time_string) { '1897-01-01T00:00:00.000+0000' }
+    let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
     let(:data) { {'some' => 'data'} }
     let(:base_message) { {'message' => message, 'timestamp' => time_string } }
     let(:data_field) { { 'data' => data } }
@@ -45,30 +34,6 @@ RSpec.describe Lorekeeper do
           logger.send("#{method}_with_data", message, data)
           expect(io.received_message).to eq(expected_data)
         end
-      end
-    end
-
-    shared_examples_for 'permanent fields added to the output' do
-      let(:new_fields) { {'planet' => 'hyperion' }}
-      let(:expected) { base_message.merge(new_fields) }
-      let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
-
-      it_behaves_like 'Logging methods'
-
-      context 'Keys which data is nil are not present in the output' do
-        let(:new_fields) { {'tree' => nil }}
-        let(:expected) { base_message }
-        let(:expected_data) { base_message.merge(data_field) }
-        it_behaves_like 'Logging methods'
-      end
-
-      context 'can remove fields' do
-        let(:expected) { base_message }
-        let(:expected_data) { base_message.merge(data_field) }
-        before do
-          logger.remove_fields(['planet'])
-        end
-        it_behaves_like 'Logging methods'
       end
     end
 
@@ -163,17 +128,126 @@ RSpec.describe Lorekeeper do
       end
 
       context 'Added some thread safe fields' do
+        let(:new_fields) { {'planet' => 'hyperion' }}
+        let(:expected) { base_message.merge(new_fields) }
+        let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
         before do
           logger.add_fields(new_fields)
         end
-        it_behaves_like 'permanent fields added to the output'
+
+        it_behaves_like 'Logging methods'
+
+        it 'fields can be retrieved with #current_fields' do
+          logger.debug(message)
+          expect(logger.current_fields).to eq(expected)
+        end
+
+        context 'Keys which data is nil are not present in the output' do
+          let(:new_fields) { {'tree' => nil }}
+          let(:expected) { base_message }
+          let(:expected_data) { base_message.merge(data_field) }
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'Keys which data is empty are not present in the output' do
+          let(:new_fields) { {'tree' => {} }}
+          let(:expected) { base_message }
+          let(:expected_data) { base_message.merge(data_field) }
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'can remove fields' do
+          let(:expected) { base_message }
+          let(:expected_data) { base_message.merge(data_field) }
+          before do
+            logger.remove_fields(['planet'])
+          end
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'can remove fields not present' do
+          let(:expected) { base_message.merge(new_fields) }
+          let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
+          before do
+            logger.remove_fields(['stars'])
+          end
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'Can keep adding fields' do
+          let(:more_fields) { { 'shriek' => 'tree' } }
+          let(:all_fields) { new_fields.merge(more_fields) }
+          let(:expected) { base_message.merge(all_fields) }
+          let(:expected_data) { base_message.merge(data_field).merge(all_fields) }
+          before do
+            logger.add_fields(more_fields)
+          end
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'thread safe variables modified' do
+          let(:more_fields) { { 'shriek' => 'tree' } }
+          it 'do not modify other threads' do
+            logger = described_class.new(io)
+            Thread.new do
+              logger.add_fields(more_fields)
+            end.join
+            logger.error(message)
+            expect(io.received_message).to eq(base_message)
+          end
+        end
       end
 
       context 'Added some thread unsafe fields' do
+        let(:new_fields) { {'planet' => 'hyperion' }}
+        let(:expected) { base_message.merge(new_fields) }
+        let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
         before do
           logger.add_thread_unsafe_fields(new_fields)
         end
-        it_behaves_like 'permanent fields added to the output'
+
+        it_behaves_like 'Logging methods'
+
+        context 'Keys which data is nil are not present in the output' do
+          let(:new_fields) { {'tree' => nil }}
+          let(:expected) { base_message }
+          let(:expected_data) { base_message.merge(data_field) }
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'can remove fields' do
+          let(:expected) { base_message }
+          let(:expected_data) { base_message.merge(data_field) }
+          before do
+            logger.remove_thread_unsafe_fields(['planet'])
+          end
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'Can keep adding fields' do
+          let(:more_fields) { { 'shriek' => 'tree' } }
+          let(:all_fields) { new_fields.merge(more_fields) }
+          let(:expected) { base_message.merge(all_fields) }
+          let(:expected_data) { base_message.merge(data_field).merge(all_fields) }
+          before do
+            logger.add_thread_unsafe_fields(more_fields)
+          end
+          it_behaves_like 'Logging methods'
+        end
+
+        context 'thread unsafe variables modified' do
+          let(:more_fields) { { 'shriek' => 'tree' } }
+          let(:all_fields) { new_fields.merge(more_fields) }
+          let(:expected) { base_message.merge(all_fields) }
+          let(:expected_data) { base_message.merge(data_field).merge(all_fields) }
+          before do
+            Thread.new do
+              logger.add_thread_unsafe_fields(more_fields)
+            end.join
+          end
+          it_behaves_like 'Logging methods'
+        end
+
       end
 
     end

@@ -11,11 +11,11 @@ module Lorekeeper
     attr_accessor :level        # Current level, default: DEBUG
     attr_accessor :formatter    # Just for compatibility with Logger, not used
 
-    def debug?; @level <= DEBUG; end
-    def info?; @level <= INFO; end
-    def warn?; @level <= WARN; end
-    def error?; @level <= ERROR; end
-    def fatal?; @level <= FATAL; end
+    def debug?; level <= DEBUG; end
+    def info?; level <= INFO; end
+    def warn?; level <= WARN; end
+    def error?; level <= ERROR; end
+    def fatal?; level <= FATAL; end
 
     def initialize(file)
       @level = DEBUG

@@ -6,16 +6,23 @@ require 'lorekeeper/fast_logger'
 module Lorekeeper
   # The JSONLogger provides a logger which will output messages in JSON format
   class JSONLogger < FastLogger
+
     def initialize(file)
-      @base_fields = { 'message' => '', 'timestamp' => '' }
+      reset_state
+      @base_fields = { MESSAGE => '', TIMESTAMP => '' }
       super(file)
     end
 
+    def current_fields
+      state[:base_fields]
+    end
+
     def state
-      thread_key = @thread_key ||= "lorekeeper_#{object_id}".freeze
-      Thread.current[thread_key] ||= begin
-        { base_fields: @base_fields.dup, extra_fields: {}}
-      end
+      Thread.current[THREAD_KEY] ||= { base_fields: @base_fields.dup, extra_fields: {} }
+    end
+
+    def reset_state
+      Thread.current[THREAD_KEY] = nil
     end
 
     # Delegates methods to the existing Logger instance
@@ -30,24 +37,26 @@ module Lorekeeper
     end
 
     def add_thread_unsafe_fields(fields)
-      fields.delete_if { |_, v| v.nil? }
+      remove_invalid_fields(fields)
       @base_fields.merge!(fields)
+      reset_state # Forcing to recreate the thread safe information
     end
 
     def remove_thread_unsafe_fields(fields)
       [*fields].each do |field|
         @base_fields.delete(field)
       end
+      reset_state
     end
 
     def add_fields(fields)
-       fields.delete_if { |_, v| v.nil? }
-       state[:base_fields].merge!(fields)
+      remove_invalid_fields(fields)
+      state.fetch(:base_fields).merge!(fields)
     end
 
     def remove_fields(fields)
       [*fields].each do |field|
-        state[:base_fields].delete(field)
+        state.fetch(:base_fields).delete(field)
       end
     end
 
@@ -73,17 +82,25 @@ module Lorekeeper
 
    private
 
-   def with_extra_fields(fields)
-     state[:extra_fields] = fields
-     yield
-     state[:extra_fields] = {}
-   end
-
-    DATE_FORMAT = '%FT%T.%L%z'.freeze
+    THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze #Shared by all threads but unique by thread
     MESSAGE = 'message'.freeze
     TIMESTAMP = 'timestamp'.freeze
+    DATE_FORMAT = '%FT%T.%L%z'.freeze
+
+    def with_extra_fields(fields)
+      state[:extra_fields] = fields
+      yield
+      state[:extra_fields] = {}
+    end
+
+    def remove_invalid_fields(fields)
+      fields.delete_if do |_, v|
+        v.nil? || v.respond_to?(:empty?) && v.empty?
+      end
+    end
 
     def log_data(_method_sym, message)
+      # merging is slow, we do not want to merge with empty hash if possible
       fields_to_log = if state[:extra_fields].empty?
         state[:base_fields]
       else
@@ -91,56 +108,19 @@ module Lorekeeper
       end
 
       fields_to_log[MESSAGE] = message
-      fields_to_log[TIMESTAMP] = Time.now.strftime(DATE_FORMAT)
+      fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
 
       @iodevice.write(Oj.dump(fields_to_log) + "\n")
     end
   end
 
-  # Allows to create a logger that will pass information to any logger registered
-  # It is useful so send the same message thought different loggers to different sinks
-  class MultiLogger
-    def initialize
-      @loggers = []
-    end
-    def add_logger(logger)
-      @loggers << logger
-    end
-
-    def method_missing(method, *args, &block)
-      @loggers.each do |logger|
-        logger.send(method, *args, &block) if logger.respond_to?(method)
-      end
-    end
-  end
-
   # Simple logger which tries to have an easy to see output.
   class SimpleLogger < FastLogger
-    SUCCESS = '96'
-    WHITE = '97'
     SEVERITY_TO_COLOR_MAP   = {debug: '0;37', info: '0;37', warn: '33', error: '31', fatal: '31', unknown: '37'}
-    INDENT = ' ' * 8
-    TITLE_RIBBON = "\n****************************************************************************\n".freeze
 
     def log_data(method_sym, message)
       color = SEVERITY_TO_COLOR_MAP[method_sym]
-      indent = ''
-
-      if message.start_with?('Started ')
-        color = WHITE
-        message = message + TITLE_RIBBON
-      end
-
-      completed_transaction = message.match(/Completed (\d*)/)
-      if completed_transaction
-        if completed_transaction.captures.first.to_i > 400
-          color = SEVERITY_TO_COLOR_MAP[:error]
-        else
-          color = SUCCESS #SEVERITY_TO_COLOR_MAP[:info]
-        end
-        message = TITLE_RIBBON + message + TITLE_RIBBON
-      end
-      @iodevice.write("#{indent}\033[#{color}m#{message}\033[0m\n")
+      @iodevice.write("\033[#{color}m#{message}\033[0m\n")
     end
   end
 

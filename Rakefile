@@ -3,6 +3,7 @@ require 'tempfile'
 require 'securerandom'
 require 'benchmark/ips'
 require 'byebug'
+require 'rbtrace'
 
 $LOAD_PATH.unshift(File.expand_path("../lib", __FILE__))
 $LOAD_PATH.uniq!
@@ -12,7 +13,6 @@ require 'logger'
 
 def create_logger
   logfile = Tempfile.new('my_test_log.log')
-  logfile = 'asdf'
   extra_fields = {
     machine:"Verylongmachinenametobe-Pro.local",
     component: 'Gilean', version: '0.1.1', trace_id: SecureRandom.hex(16), span_id: SecureRandom.hex(16), parent_span_id: SecureRandom.hex(16)
@@ -27,8 +27,19 @@ def create_simple_logger
   ::Logger.new(logfile.path)
 end
 
+# This task is used to help development of Lorekeeper. Use together with rbtrace
+desc "Runs the code once, sleeping to allow you to attach to it with rbtrace"
+task :run_once do
+  contents = 'This is a test, this is only a test. Do not worry about these contents.'
+  long_contents = contents * 100
 
-# This task is used to help development of Astinus. Clients do not need to depend on this.
+  log = create_logger
+  sleep(10)
+  log.error(long_contents)
+end
+
+
+# This task is used to help development of Lorekeeer. Make sure it is fast enough for your app.
 desc "Runs benchmarks for the library."
 task :benchmark do
 
