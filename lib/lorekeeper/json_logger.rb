@@ -31,9 +31,9 @@ module Lorekeeper
       define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
         return true if METHOD_SEVERITY_MAP[method_name] < @level
         extra_fields = {'data' => (data || {}) }
-        with_extra_fields(extra_fields) do
+        with_extra_fields(extra_fields) { # Using do/end here only valid on Ruby>= 2.3
           add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
-        end
+        }
       end
     end
 
