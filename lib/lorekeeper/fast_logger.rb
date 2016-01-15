@@ -29,14 +29,19 @@ module Lorekeeper
     # We support a string as a parameter and also a block
     LOGGING_METHODS.each do |method_name|
       define_method method_name.to_s, ->(message_param = nil, &block) do
-        return true if METHOD_SEVERITY_MAP[method_name] < @level
-        message = message_param || (block && block.call)
-        log_data(method_name, message.freeze)
+        add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
       end
     end
 
+    # This is part of the standard Logger API, we need this to be compatible
+    def add(severity, message_param = nil, progname = nil, &block)
+      return true if severity < @level
+      message = message_param || (block && block.call)
+      log_data(severity, message.freeze)
+    end
+
     # inherited classes probably want to reimplement this
-    def log_data(_method_sym, message)
+    def log_data(_severity, message)
       @iodevice.write(message)
     end
 

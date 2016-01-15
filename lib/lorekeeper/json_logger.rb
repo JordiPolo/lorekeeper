@@ -31,8 +31,9 @@ module Lorekeeper
       define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
         return true if METHOD_SEVERITY_MAP[method_name] < @level
         extra_fields = {'data' => (data || {}) }
-        message = message_param || (block && block.call)
-        with_extra_fields(extra_fields) { log_data(method_name, message.freeze) }
+        with_extra_fields(extra_fields) do
+          add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
+        end
       end
     end
 
@@ -99,7 +100,7 @@ module Lorekeeper
       end
     end
 
-    def log_data(_method_sym, message)
+    def log_data(_severity, message)
       # merging is slow, we do not want to merge with empty hash if possible
       fields_to_log = if state[:extra_fields].empty?
         state[:base_fields]
@@ -116,10 +117,13 @@ module Lorekeeper
 
   # Simple logger which tries to have an easy to see output.
   class SimpleLogger < FastLogger
-    SEVERITY_TO_COLOR_MAP   = {debug: '0;37', info: '0;37', warn: '33', error: '31', fatal: '31', unknown: '37'}
+    SEVERITY_TO_COLOR_MAP = {
+      DEBUG => '0;37', INFO => '0;37', WARN => '33',
+      ERROR => '31', FATAL => '31', UNKNOWN => '37'
+    }
 
-    def log_data(method_sym, message)
-      color = SEVERITY_TO_COLOR_MAP[method_sym]
+    def log_data(severity, message)
+      color = SEVERITY_TO_COLOR_MAP[severity]
       @iodevice.write("\033[#{color}m#{message}\033[0m\n")
     end
   end
