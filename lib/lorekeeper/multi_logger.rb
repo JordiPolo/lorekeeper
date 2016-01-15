@@ -1,4 +1,4 @@
-
+# frozen_string_literal: true
 module Lorekeeper
   # Allows to create a logger that will pass information to any logger registered
   # It is useful so send the same message thought different loggers to different sinks
@@ -6,6 +6,7 @@ module Lorekeeper
     def initialize
       @loggers = []
     end
+
     def add_logger(logger)
       @loggers << logger
     end

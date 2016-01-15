@@ -3,13 +3,12 @@ require 'json'
 
 RSpec.describe Lorekeeper do
   describe Lorekeeper::JSONLogger do
-
     let(:io) { FakeJSONIO.new }
-    let(:current_time) { Time.utc(1897,1,1) }
+    let(:current_time) { Time.utc(1897, 1, 1) }
     let(:time_string) { '1897-01-01T00:00:00.000+0000' }
     let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
-    let(:data) { {'some' => 'data'} }
-    let(:base_message) { {'message' => message, 'timestamp' => time_string } }
+    let(:data) { { 'some' => 'data' } }
+    let(:base_message) { { 'message' => message, 'timestamp' => time_string } }
     let(:data_field) { { 'data' => data } }
 
     before(:each) do
@@ -22,11 +21,11 @@ RSpec.describe Lorekeeper do
           logger.send(method, message)
           expect(io.received_message).to eq(expected)
         end
-        it "The first key is message" do
+        it 'The first key is message' do
           logger.send(method, message)
           expect(io.received_message.keys[0]).to eq('message')
         end
-        it "The second key is the timestamp" do
+        it 'The second key is the timestamp' do
           logger.send(method, message)
           expect(io.received_message.keys[1]).to eq('timestamp')
         end
@@ -38,7 +37,7 @@ RSpec.describe Lorekeeper do
     end
 
     context 'Logger with proper IO' do
-      let(:logger) {described_class.new(io)}
+      let(:logger) { described_class.new(io) }
       let(:expected) { base_message }
       let(:expected_data) { base_message.merge(data_field) }
 
@@ -52,8 +51,8 @@ RSpec.describe Lorekeeper do
         let(:stack) { ['First line', 'Second line'] }
         let(:exception_data) do
           base_message.merge(
-            {'exception' => "StandardError: #{exception_msg}",
-             'message' => exception_msg, 'stack' => stack }
+            'exception' => "StandardError: #{exception_msg}",
+            'message' => exception_msg, 'stack' => stack
           )
         end
 
@@ -77,14 +76,13 @@ RSpec.describe Lorekeeper do
             logger.info(message)
             expect(io.received_message).to eq(base_message)
           end
-
         end
 
         context 'Logging an exception with custom message' do
           let(:exception_data) do
             base_message.merge(
-              {'exception' => "StandardError: #{exception_msg}",
-               'message' => message, 'stack' => stack }
+              'exception' => "StandardError: #{exception_msg}",
+              'message' => message, 'stack' => stack
             )
           end
           it 'Logs the exception' do
@@ -96,8 +94,8 @@ RSpec.describe Lorekeeper do
         context 'Logging an exception with custom message and data' do
           let(:exception_data) do
             base_message.merge(
-              {'exception' => "StandardError: #{exception_msg}",
-               'message' => message, 'stack' => stack}.merge(data_field)
+              { 'exception' => "StandardError: #{exception_msg}",
+                'message' => message, 'stack' => stack }.merge(data_field)
             )
           end
           it 'Logs the exception' do
@@ -118,7 +116,9 @@ RSpec.describe Lorekeeper do
         end
 
         context 'error when there is no exception class' do
-          let(:base_message) { {'message' => "String: #{message.inspect} ", 'timestamp' => time_string, 'data' => {} } }
+          let(:base_message) do
+            { 'message' => "String: #{message.inspect} ", 'timestamp' => time_string, 'data' => {} }
+          end
 
           it 'Logs the exception message' do
             logger.exception(message)
@@ -128,7 +128,7 @@ RSpec.describe Lorekeeper do
       end
 
       context 'Added some thread safe fields' do
-        let(:new_fields) { {'planet' => 'hyperion' }}
+        let(:new_fields) { { 'planet' => 'hyperion' } }
         let(:expected) { base_message.merge(new_fields) }
         let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
         before do
@@ -143,14 +143,14 @@ RSpec.describe Lorekeeper do
         end
 
         context 'Keys which data is nil are not present in the output' do
-          let(:new_fields) { {'tree' => nil }}
+          let(:new_fields) { { 'tree' => nil } }
           let(:expected) { base_message }
           let(:expected_data) { base_message.merge(data_field) }
           it_behaves_like 'Logging methods'
         end
 
         context 'Keys which data is empty are not present in the output' do
-          let(:new_fields) { {'tree' => {} }}
+          let(:new_fields) { { 'tree' => {} } }
           let(:expected) { base_message }
           let(:expected_data) { base_message.merge(data_field) }
           it_behaves_like 'Logging methods'
@@ -199,7 +199,7 @@ RSpec.describe Lorekeeper do
       end
 
       context 'Added some thread unsafe fields' do
-        let(:new_fields) { {'planet' => 'hyperion' }}
+        let(:new_fields) { { 'planet' => 'hyperion' } }
         let(:expected) { base_message.merge(new_fields) }
         let(:expected_data) { base_message.merge(data_field).merge(new_fields) }
         before do
@@ -209,7 +209,7 @@ RSpec.describe Lorekeeper do
         it_behaves_like 'Logging methods'
 
         context 'Keys which data is nil are not present in the output' do
-          let(:new_fields) { {'tree' => nil }}
+          let(:new_fields) { { 'tree' => nil } }
           let(:expected) { base_message }
           let(:expected_data) { base_message.merge(data_field) }
           it_behaves_like 'Logging methods'
@@ -247,9 +247,7 @@ RSpec.describe Lorekeeper do
           end
           it_behaves_like 'Logging methods'
         end
-
       end
-
     end
 
     context 'Logger with empty IO' do
@@ -266,6 +264,5 @@ RSpec.describe Lorekeeper do
         end
       end
     end
-
   end
 end

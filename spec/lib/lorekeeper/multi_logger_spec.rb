@@ -7,7 +7,7 @@ RSpec.describe Lorekeeper::MultiLogger do
 
   context 'no loggers added' do
     it 'does not raise any error calling any method' do
-      expect{ logger.error }.not_to raise_error
+      expect { logger.error }.not_to raise_error
     end
   end
 
@@ -28,7 +28,5 @@ RSpec.describe Lorekeeper::MultiLogger do
       expect(io.received_message).to eq(nil)
       expect(io2.received_message).to eq(nil)
     end
-
   end
-
 end

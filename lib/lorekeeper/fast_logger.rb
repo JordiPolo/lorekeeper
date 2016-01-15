@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 # The comment above will make all strings in a current file frozen
-
 require 'logger'
 
 module Lorekeeper
-
   # Very simple, very fast logger
   class FastLogger
     include ::Logger::Severity  # contains the levels constants: DEBUG, ERROR, etc.
@@ -23,7 +21,7 @@ module Lorekeeper
     end
 
     LOGGING_METHODS = %i(debug info warn error fatal)
-    METHOD_SEVERITY_MAP = {debug: DEBUG, info: INFO, warn: WARN, error: ERROR, fatal: FATAL}
+    METHOD_SEVERITY_MAP = { debug: DEBUG, info: INFO, warn: WARN, error: ERROR, fatal: FATAL }
 
     # We define the behaviour of all the usual logging methods
     # We support a string as a parameter and also a block
@@ -34,7 +32,7 @@ module Lorekeeper
     end
 
     # This is part of the standard Logger API, we need this to be compatible
-    def add(severity, message_param = nil, progname = nil, &block)
+    def add(severity, message_param = nil, _ = nil, &block)
       return true if severity < @level
       message = message_param || (block && block.call)
       log_data(severity, message.freeze)
@@ -48,12 +46,13 @@ module Lorekeeper
     private
 
     require 'monitor'
+    # Mutex to avoid broken lines when multiple threads access the log file
     class LogDeviceMutex
       include MonitorMixin
     end
 
+    # Very fast class to write to a log file.
     class LogDevice
-
       def initialize(file)
         @iodevice = to_iodevice(file)
         @iomutex = LogDeviceMutex.new
@@ -85,6 +84,5 @@ module Lorekeeper
         puts "File #{filename} can't be open for logging. #{e.message}"
       end
     end
-
   end
 end

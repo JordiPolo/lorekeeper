@@ -30,7 +30,7 @@ module Lorekeeper
     LOGGING_METHODS.each do |method_name|
       define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
         return true if METHOD_SEVERITY_MAP[method_name] < @level
-        extra_fields = {'data' => (data || {}) }
+        extra_fields = { 'data' => (data || {}) }
         with_extra_fields(extra_fields) { # Using do/end here only valid on Ruby>= 2.3
           add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
         }
@@ -81,9 +81,9 @@ module Lorekeeper
       end
     end
 
-   private
+    private
 
-    THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze #Shared by all threads but unique by thread
+    THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze # Shared by all threads but unique by thread
     MESSAGE = 'message'.freeze
     TIMESTAMP = 'timestamp'.freeze
     DATE_FORMAT = '%FT%T.%L%z'.freeze

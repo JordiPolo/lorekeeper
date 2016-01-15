@@ -4,7 +4,6 @@ require_relative 'support/fake_io'
 require 'lorekeeper'
 require 'timecop'
 
-
 Bundler.setup
 
 RSpec.configure do |config|
@@ -17,5 +16,4 @@ RSpec.configure do |config|
   end
 
   config.order = 'random'
-
 end

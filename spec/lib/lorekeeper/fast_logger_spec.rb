@@ -10,17 +10,17 @@ RSpec.describe Lorekeeper::FastLogger do
     LEVEL_CHECKERS =
       {
         -1 =>
-          { :debug? => true, :info? => true, :warn? => true, :error? => true, :fatal? => true },
+          { debug?: true, info?: true, warn?: true, error?: true, fatal?: true },
         described_class::DEBUG =>
-          { :debug? => true, :info? => true, :warn? => true, :error? => true, :fatal? => true },
+          { debug?: true, info?: true, warn?: true, error?: true, fatal?: true },
         described_class::INFO =>
-          { :debug? => false, :info? => true, :warn? => true, :error? => true, :fatal? => true },
+          { debug?: false, info?: true, warn?: true, error?: true, fatal?: true },
         described_class::WARN =>
-          { :debug? => false, :info? => false, :warn? => true, :error? => true, :fatal? => true },
+          { debug?: false, info?: false, warn?: true, error?: true, fatal?: true },
         described_class::ERROR =>
-          { :debug? => false, :info? => false, :warn? => false, :error? => true, :fatal? => true },
+          { debug?: false, info?: false, warn?: false, error?: true, fatal?: true },
         described_class::FATAL =>
-          { :debug? => false, :info? => false, :warn? => false, :error? => false, :fatal? => true }
+          { debug?: false, info?: false, warn?: false, error?: false, fatal?: true }
       }
     LEVEL_CHECKERS.each_pair do |log_level, checkers|
       it "level checkers return correct values for #{log_level}" do
@@ -53,5 +53,4 @@ RSpec.describe Lorekeeper::FastLogger do
       end
     end
   end
-
 end
