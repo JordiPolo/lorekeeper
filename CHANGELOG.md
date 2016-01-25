@@ -1,3 +1,6 @@
+# 1.2
+Added a silence_logger method to the logger. For compatibility with
+activerecord-session and maybe other gems.
 # 1.1.1
 Avoid syntax errors in rubies < 2.3
 

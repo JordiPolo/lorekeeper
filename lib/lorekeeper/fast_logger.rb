@@ -38,6 +38,14 @@ module Lorekeeper
       log_data(severity, message.freeze)
     end
 
+    # Some gems like to add this method. For instance:
+    # https://github.com/rails/activerecord-session_store
+    # To avoid needing to monkey-patch Lorekeeper just to get this method, we are adding a simple
+    # non-functional version here.
+    def silence_logger(&block)
+      yield if block_given?
+    end
+
     # inherited classes probably want to reimplement this
     def log_data(_severity, message)
       @iodevice.write(message)
