@@ -43,6 +43,14 @@ RSpec.describe Lorekeeper::FastLogger do
       logger.error(message)
       expect(File.read(filename)).to eq(message)
     end
+
+    it 'creates files for writing if they do not exist' do
+      filename = "/tmp/non_existent_file"
+      File.delete(filename) if File.exist?(filename)
+      logger = described_class.new(filename)
+      logger.error(message)
+      expect(File.read(filename)).to eq(message)
+    end
   end
 
   describe '#silence_logger' do

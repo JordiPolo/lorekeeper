@@ -1,3 +1,6 @@
+# 1.2.1
+If a file does not exist, it will create it on behalf of the application
+
 # 1.2
 Added a silence_logger method to the logger. For compatibility with
 activerecord-session and maybe other gems.

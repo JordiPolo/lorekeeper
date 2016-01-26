@@ -89,7 +89,13 @@ module Lorekeeper
       def open_logfile(filename)
         File.open(filename, (File::WRONLY | File::APPEND))
       rescue Errno::ENOENT => e
-        puts "File #{filename} can't be open for logging. #{e.message}"
+        create_logfile(filename)
+      end
+
+      def create_logfile(filename)
+        File.open(filename, (File::WRONLY | File::APPEND | File::CREAT))
+      rescue Errno::EEXIST
+        open_logfile(filename)
       end
     end
   end
