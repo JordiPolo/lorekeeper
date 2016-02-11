@@ -111,7 +111,7 @@ module Lorekeeper
       fields_to_log[MESSAGE] = message
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
 
-      @iodevice.write(Oj.dump(fields_to_log) + "\n")
+      @iodevice.write(Oj.dump(fields_to_log) << "\n")
     end
   end
 
