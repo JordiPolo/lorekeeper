@@ -13,6 +13,9 @@ class FakeJSONIO
 end
 
 class FakeIO
+  def initialize
+    @msg = nil
+  end
   def close
   end
 

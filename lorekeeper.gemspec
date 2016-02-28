@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = ' Very fast JSON logger '
   spec.description   = ' Opinionated logger which outputs messages in JSON format '
-  spec.homepage      = 'http://www.gihub.com/jordipolo/lorekeeper'
+  spec.homepage      = 'http://www.github.com/jordipolo/lorekeeper'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

@@ -88,7 +88,7 @@ module Lorekeeper
 
       def open_logfile(filename)
         File.open(filename, (File::WRONLY | File::APPEND))
-      rescue Errno::ENOENT => e
+      rescue Errno::ENOENT
         create_logfile(filename)
       end
 
