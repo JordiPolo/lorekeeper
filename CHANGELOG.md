@@ -1,3 +1,8 @@
+# 1.3.0
+Time in the JSON output specifies microseconds.
+Using 'Z' to specify the UTC timezone instead of +0000 as per ISO 8601.
+Debug and Info messages use the default foreground color of the terminal.
+
 # 1.2.1
 If a file does not exist, it will create it on behalf of the application
 

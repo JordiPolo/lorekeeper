@@ -86,7 +86,7 @@ module Lorekeeper
     THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze # Shared by all threads but unique by thread
     MESSAGE = 'message'.freeze
     TIMESTAMP = 'timestamp'.freeze
-    DATE_FORMAT = '%FT%T.%L%z'.freeze
+    DATE_FORMAT = '%FT%T.%6NZ'.freeze
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
@@ -117,14 +117,24 @@ module Lorekeeper
 
   # Simple logger which tries to have an easy to see output.
   class SimpleLogger < FastLogger
+    # From http://misc.flogisoft.com/bash/tip_colors_and_formatting
+    # 39: default for the theme
+    # 33: yellow
+    # 31: red
+    # 37: light gray
     SEVERITY_TO_COLOR_MAP = {
-      DEBUG => '0;37', INFO => '0;37', WARN => '33',
-      ERROR => '31', FATAL => '31', UNKNOWN => '37'
-    }
+      DEBUG => '39'.freeze,
+      INFO => DEBUG,
+      WARN => '33'.freeze,
+      ERROR => '31'.freeze,
+      FATAL => ERROR,
+      UNKNOWN => '37'.freeze
+    }.freeze
 
+    # \e[colorm sets a color \e[0m resets all properties
     def log_data(severity, message)
       color = SEVERITY_TO_COLOR_MAP[severity]
-      @iodevice.write("\033[#{color}m#{message}\033[0m\n")
+      @iodevice.write("\e[#{color}m#{message}\e[0m\n")
     end
   end
 

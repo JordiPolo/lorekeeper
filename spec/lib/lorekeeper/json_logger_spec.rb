@@ -5,7 +5,7 @@ RSpec.describe Lorekeeper do
   describe Lorekeeper::JSONLogger do
     let(:io) { FakeJSONIO.new }
     let(:current_time) { Time.utc(1897, 1, 1) }
-    let(:time_string) { '1897-01-01T00:00:00.000+0000' }
+    let(:time_string) { '1897-01-01T00:00:00.000000Z'}
     let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
     let(:data) { { 'some' => 'data' } }
     let(:base_message) { { 'message' => message, 'timestamp' => time_string } }
