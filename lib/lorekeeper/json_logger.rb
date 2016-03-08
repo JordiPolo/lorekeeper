@@ -81,6 +81,10 @@ module Lorekeeper
       end
     end
 
+    def inspect
+      "Lorekeeper JSON logger. IO: #{@file.inspect}"
+    end
+
     private
 
     THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze # Shared by all threads but unique by thread
@@ -135,6 +139,10 @@ module Lorekeeper
     def log_data(severity, message)
       color = SEVERITY_TO_COLOR_MAP[severity]
       @iodevice.write("\e[#{color}m#{message}\e[0m\n")
+    end
+
+    def inspect
+      "Lorekeeper Simple logger. IO: #{@file.inspect}"
     end
   end
 

@@ -1,3 +1,6 @@
+# 1.3.1
+Loggers provide an inspect method to avoid being too noisy on outputs
+
 # 1.3.0
 Time in the JSON output specifies microseconds.
 Using 'Z' to specify the UTC timezone instead of +0000 as per ISO 8601.

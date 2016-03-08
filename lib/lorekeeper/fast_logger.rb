@@ -18,6 +18,7 @@ module Lorekeeper
     def initialize(file)
       @level = DEBUG
       @iodevice = LogDevice.new(file)
+      @file = file # We only keep this so we can inspect where we are sending the logs
     end
 
     LOGGING_METHODS = %i(debug info warn error fatal)

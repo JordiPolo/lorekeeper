@@ -11,6 +11,10 @@ module Lorekeeper
       @loggers << logger
     end
 
+    def inspect
+      "Lorekeeper multilogger, loggers: #{@loggers.map(&:inspect)}"
+    end
+
     def method_missing(method, *args, &block)
       result = @loggers.map do |logger|
         logger.public_send(method, *args, &block) if logger.respond_to?(method)
