@@ -1,3 +1,9 @@
+# 1.4.0
+Adds '_with_data' to the simple logger so we can display data in the
+terminal
+Adds 'respond_to?' to the multilogger so users can check capabilities of
+the loggers
+
 # 1.3.1
 Loggers provide an inspect method to avoid being too noisy on outputs
 

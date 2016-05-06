@@ -144,6 +144,14 @@ module Lorekeeper
     def inspect
       "Lorekeeper Simple logger. IO: #{@file.inspect}"
     end
+
+    # Extending the logger API with methods error_with_data, etc
+    LOGGING_METHODS.each do |method_name|
+      define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
+        return true if METHOD_SEVERITY_MAP[method_name] < @level
+        log_data(METHOD_SEVERITY_MAP[method_name], "#{message_param}, data: #{data}")
+      end
+    end
   end
 
 
