@@ -21,7 +21,7 @@ module Lorekeeper
       @file = file # We only keep this so we can inspect where we are sending the logs
     end
 
-    LOGGING_METHODS = %i(debug info warn error fatal)
+    LOGGING_METHODS = [:debug, :info, :warn, :error, :fatal]
     METHOD_SEVERITY_MAP = { debug: DEBUG, info: INFO, warn: WARN, error: ERROR, fatal: FATAL }
 
     # We define the behaviour of all the usual logging methods
