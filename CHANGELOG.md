@@ -1,3 +1,9 @@
+# 1.5.1
+* Updating version to resolve issue with mistakenly created 1.5.0 gem version
+
+# 1.5.0
+* Mistakenly created version, please disregard
+
 # 1.4.1
 * Change array creation syntax to support Ruby 1.9
 
