@@ -1,3 +1,6 @@
+# 1.6.0
+* Adds 'exception' to simple logger to unify APIs
+
 # 1.5.1
 * Updating version to resolve issue with mistakenly created 1.5.0 gem version
 
