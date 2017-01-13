@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 # The comment above will make all strings in a current file frozen
-require 'oj'
+begin
+  require 'oj'
+rescue LoadError
+  class Oj
+    def self.dump(*args)
+      JSON.generate(*args)
+    end
+  end
+end
 require 'lorekeeper/fast_logger'
 
 module Lorekeeper

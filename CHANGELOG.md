@@ -1,3 +1,6 @@
+# 1.7.0
+* Support JRuby
+
 # 1.6.0
 * Adds 'exception' to simple logger to unify APIs
 
