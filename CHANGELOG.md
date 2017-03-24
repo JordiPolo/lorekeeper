@@ -1,3 +1,6 @@
+# 1.6.1
+* Update reference to OJ gem to support Ruby 2.4
+
 # 1.6.0
 * Adds 'exception' to simple logger to unify APIs
 
