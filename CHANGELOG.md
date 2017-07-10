@@ -1,3 +1,6 @@
+# 1.6.2
+* Update oj gem to resolve segmentation fault issue
+
 # 1.6.1
 * Update reference to OJ gem to support Ruby 2.4
 
