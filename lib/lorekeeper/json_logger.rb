@@ -9,7 +9,7 @@ module Lorekeeper
 
     def initialize(file)
       reset_state
-      @base_fields = { MESSAGE => '', TIMESTAMP => '' }
+      @base_fields = { TIMESTAMP => '', MESSAGE => '' }
       super(file)
     end
 
