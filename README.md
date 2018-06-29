@@ -30,7 +30,7 @@ logger.error("This is a message")
 
 Will output:
 ```
-{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100" }
+{ "timestamp": "1970-01-01T00:00:00.000+0100", "message": "This is a message" }
 ```
 
 Timestamps use ISO8601
@@ -51,8 +51,8 @@ logger.warning("This is another message")
 
 Will output:
 ```json
-{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", "role": "backend" }
-{ "message": "This is another message", "timestamp": "1970-01-01T00:00:00.000+0100", "role": "backend" }
+{ "timestamp": "1970-01-01T00:00:00.000+0100", "message": "This is a message", "role": "backend" }
+{ "timestamp": "1970-01-01T00:00:00.000+0100", "message": "This is another message", "role": "backend" }
 ```
 
 Because of speed purposes the JSON dumping is done as simply as possible. If you provide a hash of keys like:
@@ -76,7 +76,7 @@ logger.error_with_data('message', {data1: 'Extra data', data2: 'Extra data2'})
 
 Will output:
 ```json
-{ "message": "This is a message", "timestamp": "1970-01-01T00:00:00.000+0100", "data": {"data1": "Extra data", "data2": "Extra data2"} }
+{ "timestamp": "1970-01-01T00:00:00.000+0100", "message": "This is a message", "data": {"data1": "Extra data", "data2": "Extra data2"} }
 ```
 
 
@@ -91,13 +91,13 @@ rescue StandardError => e
 
 Will output:
 ```json
-{ "message": "#{e.message}", "timestamp": "1970-01-01T00:00:00.000+0100", "exception": "<exception name>", "stack": ["<stacktraceline1>", "<stacktraceline2>"] }
+{ "timestamp": "1970-01-01T00:00:00.000+0100", "message": "#{e.message}", "exception": "<exception name>", "stack": ["<stacktraceline1>", "<stacktraceline2>"] }
 ```
 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/lorekeeper.
+Bug reports and pull requests are welcome on GitHub at https://github.com/JordiPolo/lorekeeper.
 
 
 ## License

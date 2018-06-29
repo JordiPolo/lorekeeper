@@ -1,3 +1,6 @@
+# 1.6.3
+* Change the order of JSON logger base fields to log timestamp at the beginning
+
 # 1.6.2
 * Update oj gem to resolve segmentation fault issue
 

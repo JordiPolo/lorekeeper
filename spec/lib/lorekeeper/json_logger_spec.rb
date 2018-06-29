@@ -8,7 +8,7 @@ RSpec.describe Lorekeeper do
     let(:time_string) { '1897-01-01T00:00:00.000000Z'}
     let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
     let(:data) { { 'some' => 'data' } }
-    let(:base_message) { { 'message' => message, 'timestamp' => time_string } }
+    let(:base_message) { { 'timestamp' => time_string, 'message' => message } }
     let(:data_field) { { 'data' => data } }
 
     before(:each) do
@@ -21,13 +21,13 @@ RSpec.describe Lorekeeper do
           logger.send(method, message)
           expect(io.received_message).to eq(expected)
         end
-        it 'The first key is message' do
+        it 'The first key is timestamp' do
           logger.send(method, message)
-          expect(io.received_message.keys[0]).to eq('message')
+          expect(io.received_message.keys[0]).to eq('timestamp')
         end
-        it 'The second key is the timestamp' do
+        it 'The second key is message' do
           logger.send(method, message)
-          expect(io.received_message.keys[1]).to eq('timestamp')
+          expect(io.received_message.keys[1]).to eq('message')
         end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
@@ -117,7 +117,7 @@ RSpec.describe Lorekeeper do
 
         context 'error when there is no exception class' do
           let(:base_message) do
-            { 'message' => "String: #{message.inspect} ", 'timestamp' => time_string, 'data' => {} }
+            { 'timestamp' => time_string, 'message' => "String: #{message.inspect} ", 'data' => {} }
           end
 
           it 'Logs the exception message' do
