@@ -17,19 +17,19 @@ RSpec.describe Lorekeeper do
 
     shared_examples_for 'Logging methods' do
       Lorekeeper::JSONLogger::LOGGING_METHODS.each do |method|
-        it "Outputs the correct format for #{method}" do
+        it "outputs the correct format for #{method}" do
           logger.send(method, message)
           expect(io.received_message).to eq(expected)
         end
-        it 'The first key is timestamp' do
+        it 'has the timestamp in the first key' do
           logger.send(method, message)
           expect(io.received_message.keys[0]).to eq('timestamp')
         end
-        it 'The second key is message' do
+        it 'has the message in the second key' do
           logger.send(method, message)
           expect(io.received_message.keys[1]).to eq('message')
         end
-        it "Outputs the correct format for #{method}_with_data" do
+        it "outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
           expect(io.received_message).to eq(expected_data)
         end
@@ -61,17 +61,17 @@ RSpec.describe Lorekeeper do
         end
 
         context 'Logging just an exception' do
-          it 'Logs the exception' do
+          it 'logs the exception' do
             logger.exception(exception)
             expect(io.received_message).to eq(exception_data)
           end
 
-          it 'Uses error level to log the exception' do
+          it 'uses error level to log the exception' do
             expect(logger).to receive(:log_data).with(:error, anything)
             logger.exception(exception)
           end
 
-          it 'Clears the exception fields after logging the exception' do
+          it 'clears the exception fields after logging the exception' do
             logger.exception(exception)
             logger.info(message)
             expect(io.received_message).to eq(base_message)
@@ -85,7 +85,7 @@ RSpec.describe Lorekeeper do
               'message' => message, 'stack' => stack
             )
           end
-          it 'Logs the exception' do
+          it 'logs the exception' do
             logger.exception(exception, message)
             expect(io.received_message).to eq(exception_data)
           end
@@ -98,7 +98,7 @@ RSpec.describe Lorekeeper do
                 'message' => message, 'stack' => stack }.merge(data_field)
             )
           end
-          it 'Logs the exception' do
+          it 'logs the exception' do
             logger.exception(exception, message, data)
             expect(io.received_message).to eq(exception_data)
           end
@@ -120,7 +120,7 @@ RSpec.describe Lorekeeper do
             { 'timestamp' => time_string, 'message' => "String: #{message.inspect} ", 'data' => {} }
           end
 
-          it 'Logs the exception message' do
+          it 'logs the exception message' do
             logger.exception(message)
             expect(io.received_message).to eq(base_message)
           end
