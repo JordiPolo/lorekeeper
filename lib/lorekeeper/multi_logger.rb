@@ -1,7 +1,8 @@
 # frozen_string_literal: true
+
 module Lorekeeper
   # Allows to create a logger that will pass information to any logger registered
-  # It is useful so send the same message thought different loggers to different sinks
+  # It is useful so send the same message through different loggers to different sinks
   class MultiLogger
     def initialize
       @loggers = []
@@ -16,7 +17,7 @@ module Lorekeeper
     end
 
     def respond_to?(method)
-      @loggers.all?{ |logger| logger.respond_to?(method) }
+      @loggers.all? { |logger| logger.respond_to?(method) }
     end
 
     def method_missing(method, *args, &block)

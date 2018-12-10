@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'json'
 
@@ -6,9 +8,11 @@ RSpec.describe Lorekeeper do
     let(:io) { FakeJSONIO.new }
     let(:current_time) { Time.utc(1897, 1, 1) }
     let(:time_string) { '1897-01-01T00:00:00.000000Z'}
+    let(:level) { 'debug' }
+    let(:error_level) { { 'level' => 'error' } }
     let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
     let(:data) { { 'some' => 'data' } }
-    let(:base_message) { { 'message' => message, 'timestamp' => time_string } }
+    let(:base_message) { { 'message' => message, 'timestamp' => time_string, 'level' => level } }
     let(:data_field) { { 'data' => data } }
 
     before(:each) do
@@ -19,7 +23,7 @@ RSpec.describe Lorekeeper do
       Lorekeeper::JSONLogger::LOGGING_METHODS.each do |method|
         it "Outputs the correct format for #{method}" do
           logger.send(method, message)
-          expect(io.received_message).to eq(expected)
+          expect(io.received_message).to eq(expected.merge('level' => method.to_s))
         end
         it 'The first key is message' do
           logger.send(method, message)
@@ -29,9 +33,13 @@ RSpec.describe Lorekeeper do
           logger.send(method, message)
           expect(io.received_message.keys[1]).to eq('timestamp')
         end
+        it 'The third key is the level' do
+          logger.send(method, message)
+          expect(io.received_message.keys[2]).to eq('level')
+        end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
-          expect(io.received_message).to eq(expected_data)
+          expect(io.received_message).to eq(expected_data.merge('level' => method.to_s))
         end
       end
     end
@@ -52,8 +60,10 @@ RSpec.describe Lorekeeper do
         let(:exception_data) do
           base_message.merge(
             'exception' => "StandardError: #{exception_msg}",
-            'message' => exception_msg, 'stack' => stack
+            'message' => exception_msg,
+            'stack' => stack
           )
+          .merge(error_level)
         end
 
         before do
@@ -61,20 +71,32 @@ RSpec.describe Lorekeeper do
         end
 
         context 'Logging just an exception' do
-          it 'Logs the exception' do
+          it 'Logs a warning if the specified level is not recognized' do
+            logger.exception(exception, nil, nil, :critical)
+            expect(io.received_message).to eq(
+              'level' => 'warn',
+              'message' => "Logger exception called with an invalid level: 'critical'.",
+              'timestamp' => time_string
+            )
+          end
+
+          it 'Logs the exception with the error level by default' do
             logger.exception(exception)
             expect(io.received_message).to eq(exception_data)
           end
 
-          it 'Uses error level to log the exception' do
-            expect(logger).to receive(:log_data).with(:error, anything)
-            logger.exception(exception)
+          it 'Logs the exception with a specified error level' do
+            logger.exception(exception, nil, nil, :fatal)
+            expect(io.received_message).to eq(exception_data.merge('level' => 'fatal'))
           end
 
           it 'Clears the exception fields after logging the exception' do
             logger.exception(exception)
             logger.info(message)
-            expect(io.received_message).to eq(base_message)
+            expect(io.received_messages).to eq([
+              exception_data,
+              base_message.merge('level' => 'info')
+            ])
           end
         end
 
@@ -82,8 +104,10 @@ RSpec.describe Lorekeeper do
           let(:exception_data) do
             base_message.merge(
               'exception' => "StandardError: #{exception_msg}",
-              'message' => message, 'stack' => stack
+              'message' => message,
+              'stack' => stack
             )
+            .merge(error_level)
           end
           it 'Logs the exception' do
             logger.exception(exception, message)
@@ -93,10 +117,14 @@ RSpec.describe Lorekeeper do
 
         context 'Logging an exception with custom message and data' do
           let(:exception_data) do
-            base_message.merge(
-              { 'exception' => "StandardError: #{exception_msg}",
-                'message' => message, 'stack' => stack }.merge(data_field)
-            )
+            base_message
+              .merge(
+                'exception' => "StandardError: #{exception_msg}",
+                'message' => message,
+                'stack' => stack
+              )
+              .merge(data_field)
+              .merge(error_level)
           end
           it 'Logs the exception' do
             logger.exception(exception, message, data)
@@ -117,12 +145,24 @@ RSpec.describe Lorekeeper do
 
         context 'error when there is no exception class' do
           let(:base_message) do
-            { 'message' => "String: #{message.inspect} ", 'timestamp' => time_string, 'data' => {} }
+            [
+              {
+                'level' => 'warn',
+                'message' => 'Logger exception called without exception class.',
+                'timestamp' => time_string
+              },
+              {
+                'level' => 'error',
+                'data' => nil,
+                'message' => "String: #{message.inspect} ",
+                'timestamp' => time_string
+              }
+            ]
           end
 
           it 'Logs the exception message' do
             logger.exception(message)
-            expect(io.received_message).to eq(base_message)
+            expect(io.received_messages).to eq(base_message)
           end
         end
       end
@@ -193,7 +233,7 @@ RSpec.describe Lorekeeper do
               logger.add_fields(more_fields)
             end.join
             logger.error(message)
-            expect(io.received_message).to eq(base_message)
+            expect(io.received_message).to eq(base_message.merge(error_level))
           end
         end
       end

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# The comment above will make all strings in a current file frozen
+
 require 'lorekeeper/fast_logger'
 
 module Lorekeeper
@@ -11,12 +11,12 @@ module Lorekeeper
     # 31: red
     # 37: light gray
     SEVERITY_TO_COLOR_MAP = {
-      DEBUG => '39'.freeze,
+      DEBUG => '39',
       INFO => DEBUG,
-      WARN => '33'.freeze,
-      ERROR => '31'.freeze,
+      WARN => '33',
+      ERROR => '31',
       FATAL => ERROR,
-      UNKNOWN => '37'.freeze
+      UNKNOWN => '37'
     }.freeze
 
     # \e[colorm sets a color \e[0m resets all properties
@@ -37,16 +37,21 @@ module Lorekeeper
       end
     end
 
-    def exception(exception, custom_message = nil, custom_data = nil)
+    def exception(exception, custom_message = nil, custom_data = nil, level = :error)
+      log_level = METHOD_SEVERITY_MAP[level]
+      unless log_level
+        return log_data(METHOD_SEVERITY_MAP[:warn], "Logger exception called with an invalid level: '#{level}'.")
+      end
+
       if exception.is_a?(Exception)
         backtrace = exception.backtrace || []
         message = custom_message || exception.message
-        error_with_data("#{exception.class}: #{message}", backtrace.join("\n"))
+        log_data(log_level, "#{exception.class}: #{message}, data: #{backtrace.join("\n")}")
       else
-        log_data(:warning, 'Logger exception called without exception class.')
-        error_with_data("#{exception.class}: #{exception.inspect} #{custom_message}", custom_data)
+        log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
+        message = "#{exception.class}: #{exception.inspect} #{custom_message}"
+        with_extra_fields('data' => custom_data) { log_data(log_level, message) }
       end
     end
   end
-
 end

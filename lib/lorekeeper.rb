@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'lorekeeper/version'
 require 'lorekeeper/fast_logger'
 require 'lorekeeper/simple_logger'
