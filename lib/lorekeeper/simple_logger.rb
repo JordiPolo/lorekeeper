@@ -10,13 +10,19 @@ module Lorekeeper
     # 33: yellow
     # 31: red
     # 37: light gray
+
+    COLOR_DEFAULT = '39'
+    COLOR_YELLOW = '33'
+    COLOR_RED = '31'
+    COLOR_LIGHT_GRAY = '37'
+
     SEVERITY_TO_COLOR_MAP = {
-      DEBUG => '39',
-      INFO => DEBUG,
-      WARN => '33',
-      ERROR => '31',
-      FATAL => ERROR,
-      UNKNOWN => '37'
+      DEBUG => COLOR_DEFAULT,
+      INFO => COLOR_DEFAULT,
+      WARN => COLOR_YELLOW,
+      ERROR => COLOR_RED,
+      FATAL => COLOR_RED,
+      UNKNOWN => COLOR_LIGHT_GRAY
     }.freeze
 
     # \e[colorm sets a color \e[0m resets all properties
@@ -38,19 +44,15 @@ module Lorekeeper
     end
 
     def exception(exception, custom_message = nil, custom_data = nil, level = :error)
-      log_level = METHOD_SEVERITY_MAP[level]
-      unless log_level
-        return log_data(METHOD_SEVERITY_MAP[:warn], "Logger exception called with an invalid level: '#{level}'.")
-      end
+      log_level = METHOD_SEVERITY_MAP[level] || ERROR
 
       if exception.is_a?(Exception)
         backtrace = exception.backtrace || []
         message = custom_message || exception.message
-        log_data(log_level, "#{exception.class}: #{message}, data: #{backtrace.join("\n")}")
+        log_data(log_level, "#{exception.class}: #{exception.message}; #{message}, data: #{backtrace.join("\n")}")
       else
         log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
-        message = "#{exception.class}: #{exception.inspect} #{custom_message}"
-        with_extra_fields('data' => custom_data) { log_data(log_level, message) }
+        error_with_data("#{exception.class}: #{exception.inspect} #{custom_message}", custom_data)
       end
     end
   end

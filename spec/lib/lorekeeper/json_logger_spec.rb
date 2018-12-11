@@ -22,12 +22,12 @@ RSpec.describe Lorekeeper do
       }
     end
 
-    before(:each) do
+    before do
       Timecop.freeze(current_time)
     end
 
     shared_examples_for 'Logging methods' do
-      Lorekeeper::JSONLogger::LOGGING_METHODS.each do |method|
+      described_class::LOGGING_METHODS.each do |method|
         it "Outputs the correct format for #{method}" do
           logger.send(method, message)
           expect(io.received_message).to eq(expected.merge('level' => level_name.(method)))
@@ -58,6 +58,12 @@ RSpec.describe Lorekeeper do
 
       it_behaves_like 'Logging methods'
 
+      describe '#inspect' do
+        it 'returns info about the logger itself' do
+          expect(logger.inspect).to match(/\ALorekeeper JSON logger. IO: #<FakeJSONIO/)
+        end
+      end
+
       describe '#exception' do
         let(:exception_msg) { 'This is an exception' }
         let(:exception) { StandardError.new(exception_msg) }
@@ -78,13 +84,9 @@ RSpec.describe Lorekeeper do
         end
 
         context 'Logging just an exception' do
-          it 'Logs a warning if the specified level is not recognized' do
+          it 'Falls back to ERROR if if the specified level is not recognized' do
             logger.exception(exception, nil, nil, :critical)
-            expect(io.received_message).to eq(
-              'level' => 'warning',
-              'message' => "Logger exception called with an invalid level: 'critical'.",
-              'timestamp' => time_string
-            )
+            expect(io.received_message).to eq(exception_data)
           end
 
           it 'Logs the exception with the error level by default' do
@@ -299,6 +301,12 @@ RSpec.describe Lorekeeper do
 
     context 'Logger with empty IO' do
       let(:logger) { described_class.new(nil) }
+
+      describe '#inspect' do
+        it 'returns info about the logger itself' do
+          expect(logger.inspect).to eq("Lorekeeper JSON logger. IO: nil")
+        end
+      end
 
       Lorekeeper::JSONLogger::LOGGING_METHODS.each do |method|
         it "No data is written to the device for #{method}" do

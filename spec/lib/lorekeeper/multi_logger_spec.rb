@@ -15,10 +15,12 @@ RSpec.describe Lorekeeper::MultiLogger do
 
   context 'loggers added' do
     let(:message) { 'My heart aches, and a drowsy numbness pains my sense' }
+
     before do
       logger.add_logger(io)
       logger.add_logger(io2)
     end
+
     it 'calls the methods of the loggers' do
       logger.write(message)
       expect(io.received_message).to eq(message)

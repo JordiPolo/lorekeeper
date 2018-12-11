@@ -64,10 +64,7 @@ module Lorekeeper
     # We will output backtrace twice. Once inside the stack so it can be parsed by software
     # And the other inside the message so it is readable to humans
     def exception(exception, custom_message = nil, custom_data = nil, level = :error)
-      log_level = METHOD_SEVERITY_MAP[level]
-      unless log_level
-        return log_data(METHOD_SEVERITY_MAP[:warn], "Logger exception called with an invalid level: '#{level}'.")
-      end
+      log_level = METHOD_SEVERITY_MAP[level] || ERROR
 
       if exception.is_a?(Exception)
         backtrace = exception.backtrace || []
