@@ -14,6 +14,13 @@ RSpec.describe Lorekeeper do
     let(:data) { { 'some' => 'data' } }
     let(:base_message) { { 'message' => message, 'timestamp' => time_string, 'level' => level } }
     let(:data_field) { { 'data' => data } }
+    let(:level_name) do
+      -> (method_sym) {
+        # 'warn' is logged as 'warning' so we need to look it up instead of using the method name... :facepalm:
+        severity = described_class::METHOD_SEVERITY_MAP[method_sym]
+        described_class::SEVERITY_NAMES_MAP[severity]
+      }
+    end
 
     before(:each) do
       Timecop.freeze(current_time)
@@ -23,7 +30,7 @@ RSpec.describe Lorekeeper do
       Lorekeeper::JSONLogger::LOGGING_METHODS.each do |method|
         it "Outputs the correct format for #{method}" do
           logger.send(method, message)
-          expect(io.received_message).to eq(expected.merge('level' => method.to_s))
+          expect(io.received_message).to eq(expected.merge('level' => level_name.(method)))
         end
         it 'The first key is message' do
           logger.send(method, message)
@@ -39,7 +46,7 @@ RSpec.describe Lorekeeper do
         end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
-          expect(io.received_message).to eq(expected_data.merge('level' => method.to_s))
+          expect(io.received_message).to eq(expected_data.merge('level' => level_name.(method)))
         end
       end
     end
@@ -74,7 +81,7 @@ RSpec.describe Lorekeeper do
           it 'Logs a warning if the specified level is not recognized' do
             logger.exception(exception, nil, nil, :critical)
             expect(io.received_message).to eq(
-              'level' => 'warn',
+              'level' => 'warning',
               'message' => "Logger exception called with an invalid level: 'critical'.",
               'timestamp' => time_string
             )
@@ -147,7 +154,7 @@ RSpec.describe Lorekeeper do
           let(:base_message) do
             [
               {
-                'level' => 'warn',
+                'level' => 'warning',
                 'message' => 'Logger exception called without exception class.',
                 'timestamp' => time_string
               },

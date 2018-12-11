@@ -40,7 +40,7 @@ module Lorekeeper
     SEVERITY_NAMES_MAP = {
       DEBUG => 'debug',
       INFO => 'info',
-      WARN => 'warn',
+      WARN => 'warning',
       ERROR => 'error',
       FATAL => 'fatal'
     }.freeze

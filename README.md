@@ -43,6 +43,17 @@ Timestamps use ISO8601.
 Messages are JSON escaped so the total result is JSON parseable.
 
 
+### Log Levels
+
+| Method Name | JSON Property          |
+| ----------- | ---------------------- |
+| debug       | "level": "debug"       |
+| info        | "level": "info"        |
+| warn        | **"level": "warning"** |
+| error       | "level": "error"       |
+| fatal       | "level": "fatal"       |
+
+
 ### Adding keys to the output
 
 Keys can be added to the output at any moment.
@@ -68,7 +79,7 @@ Will output:
 {
   "message": "This is another message",
   "timestamp": "1970-01-01T00:00:00.000+0100",
-  "level": "warn",
+  "level": "warning",
   "role": "backend"
 }
 ```
