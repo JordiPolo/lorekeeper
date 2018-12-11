@@ -101,7 +101,12 @@ module Lorekeeper
       def to_iodevice(file)
         return nil unless file
 
-        iodevice = file.respond_to?(:write) && file.respond_to?(:close) ? file : open_logfile(file)
+        iodevice = if file.respond_to?(:write) && file.respond_to?(:close)
+          file
+        else
+          open_logfile(file)
+        end
+
         iodevice.sync = true if iodevice.respond_to?(:sync=)
         iodevice
       end

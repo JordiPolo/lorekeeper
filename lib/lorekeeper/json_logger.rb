@@ -109,7 +109,11 @@ module Lorekeeper
 
     def log_data(severity, message)
       # merging is slow, we do not want to merge with empty hash if possible
-      fields_to_log = state[:extra_fields].empty? ? state[:base_fields] : state[:base_fields].merge(state[:extra_fields])
+      fields_to_log = if state[:extra_fields].empty?
+        state[:base_fields]
+      else
+        state[:base_fields].merge(state[:extra_fields])
+      end
 
       fields_to_log[MESSAGE] = message
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
