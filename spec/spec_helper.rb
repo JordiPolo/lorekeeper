@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'
+end
 
 require_relative 'support/fake_io'
 require 'lorekeeper'
 require 'timecop'
 require 'byebug'
 
-Bundler.setup
-
 RSpec.configure do |config|
+  config.disable_monkey_patching!
+
   config.mock_with :rspec do |c|
     c.syntax = :expect
   end
@@ -18,5 +21,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.order = 'random'
+  config.warnings = true
+
+  config.order = :random
+  Kernel.srand config.seed
 end
