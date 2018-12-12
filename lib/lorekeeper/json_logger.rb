@@ -79,7 +79,7 @@ module Lorekeeper
       else
         log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
         message = "#{exception.class}: #{exception.inspect} #{custom_message}"
-        with_extra_fields('data' => custom_data) { log_data(log_level, message) }
+        with_extra_fields('data' => (custom_data || {})) { log_data(log_level, message) }
       end
     end
 

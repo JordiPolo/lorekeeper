@@ -1,3 +1,6 @@
+# 1.7.1
+* Ensure `data` is not nil when logging wrong #exception usage
+
 # 1.7.0
 * Add the `level` property to the JSON Logger output
 
