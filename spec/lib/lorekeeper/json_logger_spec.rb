@@ -162,7 +162,7 @@ RSpec.describe Lorekeeper do
               },
               {
                 'level' => 'error',
-                'data' => nil,
+                'data' => {},
                 'message' => "String: #{message.inspect} ",
                 'timestamp' => time_string
               }
