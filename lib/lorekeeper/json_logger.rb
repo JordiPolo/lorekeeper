@@ -1,15 +1,14 @@
 # frozen_string_literal: true
-# The comment above will make all strings in a current file frozen
+
 require 'oj'
 require 'lorekeeper/fast_logger'
 
 module Lorekeeper
   # The JSONLogger provides a logger which will output messages in JSON format
   class JSONLogger < FastLogger
-
     def initialize(file)
       reset_state
-      @base_fields = { MESSAGE => '', TIMESTAMP => '' }
+      @base_fields = { MESSAGE => '', TIMESTAMP => '', LEVEL => '' }
       super(file)
     end
 
@@ -64,7 +63,9 @@ module Lorekeeper
     # @param exception: instance of a class inheriting from Exception
     # We will output backtrace twice. Once inside the stack so it can be parsed by software
     # And the other inside the message so it is readable to humans
-    def exception(exception, custom_message = nil, custom_data = nil)
+    def exception(exception, custom_message = nil, custom_data = nil, level = :error)
+      log_level = METHOD_SEVERITY_MAP[level] || ERROR
+
       if exception.is_a?(Exception)
         backtrace = exception.backtrace || []
         exception_fields = {
@@ -74,10 +75,11 @@ module Lorekeeper
         exception_fields['data'] = custom_data if custom_data
 
         message = custom_message || exception.message
-        with_extra_fields(exception_fields) { log_data(:error, message) }
+        with_extra_fields(exception_fields) { log_data(log_level, message) }
       else
-        log_data(:warning, 'Logger exception called without exception class.')
-        error_with_data("#{exception.class}: #{exception.inspect} #{custom_message}", custom_data)
+        log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
+        message = "#{exception.class}: #{exception.inspect} #{custom_message}"
+        with_extra_fields('data' => custom_data) { log_data(log_level, message) }
       end
     end
 
@@ -87,10 +89,11 @@ module Lorekeeper
 
     private
 
-    THREAD_KEY = 'lorekeeper_jsonlogger_key'.freeze # Shared by all threads but unique by thread
-    MESSAGE = 'message'.freeze
-    TIMESTAMP = 'timestamp'.freeze
-    DATE_FORMAT = '%FT%T.%6NZ'.freeze
+    THREAD_KEY = 'lorekeeper_jsonlogger_key' # Shared by all threads but unique by thread
+    LEVEL = 'level'
+    MESSAGE = 'message'
+    TIMESTAMP = 'timestamp'
+    DATE_FORMAT = '%FT%T.%6NZ'
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
@@ -104,7 +107,7 @@ module Lorekeeper
       end
     end
 
-    def log_data(_severity, message)
+    def log_data(severity, message)
       # merging is slow, we do not want to merge with empty hash if possible
       fields_to_log = if state[:extra_fields].empty?
         state[:base_fields]
@@ -114,9 +117,9 @@ module Lorekeeper
 
       fields_to_log[MESSAGE] = message
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
+      fields_to_log[LEVEL] = SEVERITY_NAMES_MAP[severity]
 
       @iodevice.write(Oj.dump(fields_to_log) << "\n")
     end
   end
-
 end

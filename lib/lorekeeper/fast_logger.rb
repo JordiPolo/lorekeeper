@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# The comment above will make all strings in a current file frozen
+
 require 'logger'
 
 module Lorekeeper
@@ -21,8 +21,29 @@ module Lorekeeper
       @file = file # We only keep this so we can inspect where we are sending the logs
     end
 
-    LOGGING_METHODS = [:debug, :info, :warn, :error, :fatal]
-    METHOD_SEVERITY_MAP = { debug: DEBUG, info: INFO, warn: WARN, error: ERROR, fatal: FATAL }
+    LOGGING_METHODS = [
+      :debug,
+      :info,
+      :warn,
+      :error,
+      :fatal
+    ].freeze
+
+    METHOD_SEVERITY_MAP = {
+      debug: DEBUG,
+      info: INFO,
+      warn: WARN,
+      error: ERROR,
+      fatal: FATAL
+    }.freeze
+
+    SEVERITY_NAMES_MAP = {
+      DEBUG => 'debug',
+      INFO => 'info',
+      WARN => 'warning',
+      ERROR => 'error',
+      FATAL => 'fatal'
+    }.freeze
 
     # We define the behaviour of all the usual logging methods
     # We support a string as a parameter and also a block
@@ -69,6 +90,7 @@ module Lorekeeper
 
       def write(message)
         return unless @iodevice
+
         @iomutex.synchronize do
           @iodevice.write(message)
         end
@@ -78,11 +100,13 @@ module Lorekeeper
 
       def to_iodevice(file)
         return nil unless file
-        iodevice = if file.respond_to?(:write) and file.respond_to?(:close)
+
+        iodevice = if file.respond_to?(:write) && file.respond_to?(:close)
           file
         else
           open_logfile(file)
         end
+
         iodevice.sync = true if iodevice.respond_to?(:sync=)
         iodevice
       end

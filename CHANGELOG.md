@@ -1,3 +1,6 @@
+# 1.7.0
+* Add the `level` property to the JSON Logger output
+
 # 1.6.2
 * Update oj gem to resolve segmentation fault issue
 
