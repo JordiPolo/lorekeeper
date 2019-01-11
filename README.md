@@ -141,6 +141,34 @@ Will output:
 }
 ```
 
+This method also accepts a custom message, data and log level.
+
+```ruby
+rescue => e
+  logger.exception(e, "custom msg!", { some: { data: 123 } }, :warn)
+end
+```
+
+Will output:
+
+```javascript
+{
+  "message": "custom msg!",
+  "timestamp": "1970-01-01T00:00:00.000+0100",
+  "level": "warning",
+  "data": {
+    ":some": {
+      ":data": 123
+    }
+  },
+  "exception": "<exception name>",
+  "stack": [
+    "<stacktraceline1>",
+    "<stacktraceline2>"
+  ]
+}
+```
+
 
 ## License
 
