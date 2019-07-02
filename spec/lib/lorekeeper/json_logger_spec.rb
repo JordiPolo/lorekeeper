@@ -120,9 +120,9 @@ RSpec.describe Lorekeeper do
             base_message.merge(
               'exception' => "StandardError: #{exception_msg}",
               'message' => exception_msg,
-              'stack' => stack
+              'stack' => stack,
+              'level' => 'info'
             )
-            .merge({ 'level' => 'info' })
           end
 
           it 'Logs the exception with the level in the parameters' do
@@ -201,7 +201,7 @@ RSpec.describe Lorekeeper do
           end
 
           it 'Logs the exception message' do
-            logger.exception(message, message: 'second part not good', data: {'planet' => 'hyperion' })
+            logger.exception(message, message: 'second part not good', data: { 'planet' => 'hyperion' })
             expect(io.received_messages).to eq(base_message)
           end
         end
@@ -304,7 +304,7 @@ RSpec.describe Lorekeeper do
           it_behaves_like 'Logging methods'
 
           it 'removes information from the local thread' do
-            expect(Thread.current[Lorekeeper::JSONLogger::THREAD_KEY]).to eq(nil)
+            expect(Thread.current[Lorekeeper::JSONLogger::THREAD_KEY]).to be_nil
           end
         end
 

@@ -60,10 +60,9 @@ module Lorekeeper
       end
     end
 
-
     # @param exception: instance of a class inheriting from Exception
-    # We will output backtrace twice. Once inside the stack so it can be parsed by software
-    # And the other inside the message so it is readable to humans
+    # By default message comes from exception.message
+    # Optional and named parameters to overwrite message, level and add data
     def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
                              message: nil, data: nil, level: nil) # Backwards compatible named params
 
@@ -118,11 +117,12 @@ module Lorekeeper
     end
 
     def log_data(severity, message)
+      current_state = state # Accessing state is slow. Do it only once per call.
       # merging is slow, we do not want to merge with empty hash if possible
-      fields_to_log = if state[:extra_fields].empty?
-        state[:base_fields]
+      fields_to_log = if current_state[:extra_fields].empty?
+        current_state[:base_fields]
       else
-        state[:base_fields].merge(state[:extra_fields])
+        current_state[:base_fields].merge(current_state[:extra_fields])
       end
 
       fields_to_log[MESSAGE] = message
