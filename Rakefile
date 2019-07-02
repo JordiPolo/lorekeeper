@@ -50,10 +50,10 @@ task :benchmark do
   simple_log = create_simple_logger
 
   Benchmark.ips do |bm|
-    bm.report('short content') { log.error(contents) }
-    bm.report('Logger short content') { simple_log.info(contents) }
-    bm.report('long content') { log.info(long_contents) }
-    bm.report('Logger long content') { simple_log.info(long_contents) }
+    bm.report('JSON short content') { log.debug(contents) }
+    bm.report('Logger short content') { simple_log.debug(contents) }
+    bm.report('JSON long content') { log.debug(long_contents) }
+    bm.report('Logger long content') { simple_log.debug(long_contents) }
     bm.compare!
   end
 

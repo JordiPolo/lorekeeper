@@ -87,6 +87,9 @@ RSpec.describe Lorekeeper do
           it 'Falls back to ERROR if if the specified level is not recognized' do
             logger.exception(exception, nil, nil, :critical)
             expect(io.received_message).to eq(exception_data)
+
+            logger.exception(exception, level: :critical)
+            expect(io.received_message).to eq(exception_data)
           end
 
           it 'Logs the exception with the error level by default' do
@@ -97,6 +100,9 @@ RSpec.describe Lorekeeper do
           it 'Logs the exception with a specified error level' do
             logger.exception(exception, nil, nil, :fatal)
             expect(io.received_message).to eq(exception_data.merge('level' => 'fatal'))
+
+            logger.exception(exception, level: :fatal)
+            expect(io.received_message).to eq(exception_data.merge('level' => 'fatal'))
           end
 
           it 'Clears the exception fields after logging the exception' do
@@ -106,6 +112,25 @@ RSpec.describe Lorekeeper do
               exception_data,
               base_message.merge('level' => 'info')
             ])
+          end
+        end
+
+        context 'Logging an exception with custom level' do
+          let(:exception_data) do
+            base_message.merge(
+              'exception' => "StandardError: #{exception_msg}",
+              'message' => exception_msg,
+              'stack' => stack
+            )
+            .merge({ 'level' => 'info' })
+          end
+
+          it 'Logs the exception with the level in the parameters' do
+            logger.exception(exception, nil, nil, :info)
+            expect(io.received_message).to eq(exception_data)
+
+            logger.exception(exception, level: :info)
+            expect(io.received_message).to eq(exception_data)
           end
         end
 
@@ -120,6 +145,9 @@ RSpec.describe Lorekeeper do
           end
           it 'Logs the exception' do
             logger.exception(exception, message)
+            expect(io.received_message).to eq(exception_data)
+
+            logger.exception(exception, message: message)
             expect(io.received_message).to eq(exception_data)
           end
         end
@@ -137,6 +165,9 @@ RSpec.describe Lorekeeper do
           end
           it 'Logs the exception' do
             logger.exception(exception, message, data)
+            expect(io.received_message).to eq(exception_data)
+
+            logger.exception(exception, message: message, data: data)
             expect(io.received_message).to eq(exception_data)
           end
         end
@@ -162,15 +193,15 @@ RSpec.describe Lorekeeper do
               },
               {
                 'level' => 'error',
-                'data' => {},
-                'message' => "String: #{message.inspect} ",
+                'data' => { 'planet' => 'hyperion' },
+                'message' => "String: #{message.inspect} second part not good",
                 'timestamp' => time_string
               }
             ]
           end
 
           it 'Logs the exception message' do
-            logger.exception(message)
+            logger.exception(message, message: 'second part not good', data: {'planet' => 'hyperion' })
             expect(io.received_messages).to eq(base_message)
           end
         end
@@ -271,6 +302,10 @@ RSpec.describe Lorekeeper do
             logger.remove_thread_unsafe_fields(['planet'])
           end
           it_behaves_like 'Logging methods'
+
+          it 'removes information from the local thread' do
+            expect(Thread.current[Lorekeeper::JSONLogger::THREAD_KEY]).to eq(nil)
+          end
         end
 
         context 'Can keep adding fields' do
