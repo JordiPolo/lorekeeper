@@ -29,7 +29,7 @@ module Lorekeeper
     LOGGING_METHODS.each do |method_name|
       define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
         return true if METHOD_SEVERITY_MAP[method_name] < @level
-        extra_fields = { 'data' => (data || {}) }
+        extra_fields = { DATA => (data || {}) }
         with_extra_fields(extra_fields) { # Using do/end here only valid on Ruby>= 2.3
           add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
         }
@@ -61,25 +61,31 @@ module Lorekeeper
     end
 
     # @param exception: instance of a class inheriting from Exception
-    # We will output backtrace twice. Once inside the stack so it can be parsed by software
-    # And the other inside the message so it is readable to humans
-    def exception(exception, custom_message = nil, custom_data = nil, level = :error)
-      log_level = METHOD_SEVERITY_MAP[level] || ERROR
+    # By default message comes from exception.message
+    # Optional and named parameters to overwrite message, level and add data
+    def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
+                             message: nil, data: nil, level: nil) # Backwards compatible named params
+
+      param_level = level || custom_level
+      param_data = data || custom_data
+      param_message = message || custom_message
+
+      log_level = METHOD_SEVERITY_MAP[param_level] || ERROR
 
       if exception.is_a?(Exception)
         backtrace = exception.backtrace || []
         exception_fields = {
-          'exception' => "#{exception.class}: #{exception.message}",
-          'stack' => backtrace
+          EXCEPTION => "#{exception.class}: #{exception.message}",
+          STACK => backtrace
         }
-        exception_fields['data'] = custom_data if custom_data
+        exception_fields[DATA] = param_data if param_data
 
-        message = custom_message || exception.message
+        message = param_message || exception.message
         with_extra_fields(exception_fields) { log_data(log_level, message) }
       else
         log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
-        message = "#{exception.class}: #{exception.inspect} #{custom_message}"
-        with_extra_fields('data' => (custom_data || {})) { log_data(log_level, message) }
+        message = "#{exception.class}: #{exception.inspect} #{param_message}"
+        with_extra_fields(DATA => (param_data || {})) { log_data(log_level, message) }
       end
     end
 
@@ -94,6 +100,9 @@ module Lorekeeper
     MESSAGE = 'message'
     TIMESTAMP = 'timestamp'
     DATE_FORMAT = '%FT%T.%6NZ'
+    EXCEPTION = 'exception'
+    STACK = 'stack'
+    DATA = 'data'
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
@@ -108,11 +117,12 @@ module Lorekeeper
     end
 
     def log_data(severity, message)
+      current_state = state # Accessing state is slow. Do it only once per call.
       # merging is slow, we do not want to merge with empty hash if possible
-      fields_to_log = if state[:extra_fields].empty?
-        state[:base_fields]
+      fields_to_log = if current_state[:extra_fields].empty?
+        current_state[:base_fields]
       else
-        state[:base_fields].merge(state[:extra_fields])
+        current_state[:base_fields].merge(current_state[:extra_fields])
       end
 
       fields_to_log[MESSAGE] = message

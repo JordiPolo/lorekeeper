@@ -169,6 +169,24 @@ Will output:
 }
 ```
 
+Alternatively you can use named parameters:
+
+
+```ruby
+rescue => e
+  logger.exception(e, message: "custom msg!", data: { some: { data: 123 } }, level: :warn)
+end
+```
+
+This is specially useful when there is no custom message or data:
+
+```ruby
+rescue => e
+  logger.exception(e, level: :warn)
+end
+```
+
+
 
 ## License
 

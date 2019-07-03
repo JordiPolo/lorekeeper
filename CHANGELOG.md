@@ -1,3 +1,6 @@
+# 1.8.0
+* Allow to use named parameters in the .exception method
+
 # 1.7.2
 * Add a second parameter to respond_to? to avoid Ruby 2.6 warnings
 * Drop support for unsupported Ruby 2.1 and Ruby 2.2
