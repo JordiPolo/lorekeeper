@@ -1,3 +1,6 @@
+# 1.9.0
+* Remove Newrelic instrumentation information from stacktrace output
+
 # 1.8.0
 * Allow to use named parameters in the .exception method
 
