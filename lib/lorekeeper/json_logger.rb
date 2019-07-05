@@ -99,7 +99,9 @@ module Lorekeeper
     # cause problems with certain logging backends.
     # Hardcoring newrelic now here. In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
-      backtrace.reject{ |line| line.include?("/newrelic_rpm-") }
+      backtrace.reject do |line|
+        BLACKLISTED_FINGERPRINTS.any? { |fingerprint| line.include?(fingerprint) }
+      end
     end
 
     THREAD_KEY = 'lorekeeper_jsonlogger_key' # Shared by all threads but unique by thread
@@ -110,6 +112,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
+    BLACKLISTED_FINGERPRINTS = ['/newrelic_rpm-']
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
