@@ -100,7 +100,7 @@ module Lorekeeper
     # Hardcoring newrelic now here. In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
       backtrace.reject do |line|
-        BLACKLISTED_FINGERPRINTS.any? { |fingerprint| line.include?(fingerprint) }
+        line.include?(BLACKLISTED_FINGERPRINT)
       end
     end
 
@@ -112,7 +112,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
-    BLACKLISTED_FINGERPRINTS = ['/newrelic_rpm-']
+    BLACKLISTED_FINGERPRINT = '/newrelic_rpm-'
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
