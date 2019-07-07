@@ -73,7 +73,7 @@ module Lorekeeper
       log_level = METHOD_SEVERITY_MAP[param_level] || ERROR
 
       if exception.is_a?(Exception)
-        backtrace = exception.backtrace || []
+        backtrace = clean_backtrace(exception.backtrace || [])
         exception_fields = {
           EXCEPTION => "#{exception.class}: #{exception.message}",
           STACK => backtrace
@@ -95,6 +95,15 @@ module Lorekeeper
 
     private
 
+    # Some instrumentation libraries pollute the stacktrace and create a large output which may
+    # cause problems with certain logging backends.
+    # Hardcoring newrelic now here. In the future if this list grows, we may make it configurable.
+    def clean_backtrace(backtrace)
+      backtrace.reject do |line|
+        line.include?(BLACKLISTED_FINGERPRINT)
+      end
+    end
+
     THREAD_KEY = 'lorekeeper_jsonlogger_key' # Shared by all threads but unique by thread
     LEVEL = 'level'
     MESSAGE = 'message'
@@ -103,6 +112,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
+    BLACKLISTED_FINGERPRINT = '/newrelic_rpm-'
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
