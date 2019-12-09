@@ -1,3 +1,6 @@
+# 1.10.0
+* Use ActiveSupport::BacktraceCleaner to reduce noise in stacktrace output
+
 # 1.9.0
 * Remove Newrelic instrumentation information from stacktrace output
 

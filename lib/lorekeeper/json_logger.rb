@@ -9,6 +9,7 @@ module Lorekeeper
     def initialize(file)
       reset_state
       @base_fields = { MESSAGE => '', TIMESTAMP => '', LEVEL => '' }
+      @backtrace_cleaner = set_backtrace_cleaner
       super(file)
     end
 
@@ -97,11 +98,19 @@ module Lorekeeper
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
-    # Hardcoring newrelic now here. In the future if this list grows, we may make it configurable.
+    # Hardcoring newrelic and active_support/callbacks now here.
+    # In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
-      backtrace.reject do |line|
-        line.include?(BLACKLISTED_FINGERPRINT)
-      end
+      @backtrace_cleaner ? @backtrace_cleaner.clean(backtrace) : backtrace
+    end
+
+    def set_backtrace_cleaner
+      return nil unless defined?(ActiveSupport::BacktraceCleaner)
+
+      cleaner = ActiveSupport::BacktraceCleaner.new
+      cleaner.remove_silencers!
+      cleaner.add_silencer { |line| line =~ BLACKLISTED_FINGERPRINT }
+      cleaner
     end
 
     THREAD_KEY = 'lorekeeper_jsonlogger_key' # Shared by all threads but unique by thread
@@ -112,7 +121,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
-    BLACKLISTED_FINGERPRINT = '/newrelic_rpm-'
+    BLACKLISTED_FINGERPRINT = %r{newrelic_rpm|active_support/callbacks.rb}.freeze
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields

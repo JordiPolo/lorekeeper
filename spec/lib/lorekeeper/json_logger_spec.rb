@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'json'
+require 'active_support'
 
 RSpec.describe Lorekeeper do
   describe Lorekeeper::JSONLogger do
@@ -81,6 +82,7 @@ RSpec.describe Lorekeeper do
 
         before do
           exception.set_backtrace(backtrace)
+          allow(Gem).to receive(:path).and_return(["/ruby/2.5.0"])
         end
 
         context 'Logging just an exception' do
@@ -116,21 +118,31 @@ RSpec.describe Lorekeeper do
 
           it 'Does not log Newrelic instrumentation information' do
             new_backtrace = [
-              "2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-              "2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-              "2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'"
+              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
+              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `block in run_callbacks'",
+              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
+              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
+              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'"
             ]
             exception.set_backtrace(new_backtrace)
             logger.exception(exception)
 
-            no_newrelic_backtrace = [
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-              "2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-            ]
+            no_newrelic_backtrace = if ActiveSupport::VERSION::MAJOR < 6
+                [
+                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+                ]
+              else
+                [
+                  "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                  "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                  "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+                ]
+              end
             expected = exception_data.merge('stack' => no_newrelic_backtrace)
 
             expect(io.received_message).to eq(expected)
