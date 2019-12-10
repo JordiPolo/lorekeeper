@@ -98,10 +98,10 @@ module Lorekeeper
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
-    # Hardcoring newrelic and active_support/callbacks now here.
+    # Hardcording newrelic and active_support/callbacks now here.
     # In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
-      @backtrace_cleaner ? @backtrace_cleaner.clean(backtrace) : backtrace
+      @backtrace_cleaner&.clean(backtrace) || backtrace
     end
 
     def set_backtrace_cleaner
@@ -109,7 +109,7 @@ module Lorekeeper
 
       cleaner = ActiveSupport::BacktraceCleaner.new
       cleaner.remove_silencers!
-      cleaner.add_silencer { |line| line =~ BLACKLISTED_FINGERPRINT }
+      cleaner.add_silencer { |line| line.match?(BLACKLISTED_FINGERPRINT) }
       cleaner
     end
 

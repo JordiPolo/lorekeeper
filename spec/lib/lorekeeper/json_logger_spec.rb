@@ -79,6 +79,18 @@ RSpec.describe Lorekeeper do
           )
           .merge(error_level)
         end
+        let(:new_backtrace) do
+          [
+            "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
+            "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `block in run_callbacks'",
+            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
+            "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
+            "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+            "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'"
+          ]
+        end
 
         before do
           exception.set_backtrace(backtrace)
@@ -116,17 +128,7 @@ RSpec.describe Lorekeeper do
             ])
           end
 
-          it 'Does not log Newrelic instrumentation information' do
-            new_backtrace = [
-              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
-              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `block in run_callbacks'",
-              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
-              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'",
-              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-              "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in `call'"
-            ]
+          it 'Does not log Newrelic instrumentation information and active_support callbacks' do
             exception.set_backtrace(new_backtrace)
             logger.exception(exception)
 
@@ -144,6 +146,16 @@ RSpec.describe Lorekeeper do
                 ]
               end
             expected = exception_data.merge('stack' => no_newrelic_backtrace)
+
+            expect(io.received_message).to eq(expected)
+          end
+
+          it 'Logs all backtraces when ActiveSupport::BacktraceCleaner is not defined' do
+            hide_const('ActiveSupport::BacktraceCleaner')
+
+            exception.set_backtrace(new_backtrace)
+            logger.exception(exception)
+            expected = exception_data.merge('stack' => new_backtrace)
 
             expect(io.received_message).to eq(expected)
           end
