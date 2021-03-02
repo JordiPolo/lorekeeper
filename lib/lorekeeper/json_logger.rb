@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'oj'
 require 'lorekeeper/fast_logger'
 
 module Lorekeeper
@@ -148,7 +147,11 @@ module Lorekeeper
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
       fields_to_log[LEVEL] = SEVERITY_NAMES_MAP[severity]
 
-      @iodevice.write(Oj.dump(fields_to_log) << "\n")
+      if defined?(Oj)
+        @iodevice.write(Oj.dump(fields_to_log) << "\n")
+      else
+        @iodevice.write(fields_to_log.to_json << "\n")
+      end
     end
   end
 end

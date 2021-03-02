@@ -1,3 +1,6 @@
+# 1.11.0
+* Make oj optional, app owner can add it if they want
+
 # 1.10.0
 * Use ActiveSupport::BacktraceCleaner to reduce noise in stacktrace output
 

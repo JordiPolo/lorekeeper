@@ -4,6 +4,12 @@ cache: bundler
 rvm:
   - 2.4.9
   - 2.5.7
-  - 2.6.5
+  - 2.6.6
+  - 2.7.2
+  - 3.0.0
+
+gemfile:
+  - gemfiles/without_oj.Gemfile
+  - gemfiles/with_oj.Gemfile
 
 script: bundle exec rspec
