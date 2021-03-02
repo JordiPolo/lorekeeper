@@ -22,10 +22,20 @@ end
 
 class FakeJSONIO < FakeIO
   def received_message
-    @msg && Oj.load(@msg)
+    @msg && load_json(@msg)
   end
 
   def received_messages
-    @received_messages.map { |m| Oj.load(m) }
+    @received_messages.map { |m| load_json(m) }
+  end
+
+  private
+
+  def load_json(message)
+    if defined?(Oj)
+      Oj.load(message)
+    else
+      JSON.parse(message)
+    end
   end
 end
