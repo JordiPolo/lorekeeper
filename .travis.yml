@@ -12,4 +12,6 @@ gemfile:
   - gemfiles/without_oj.Gemfile
   - gemfiles/with_oj.Gemfile
 
-script: bundle exec rspec
+script:
+  bundle exec rspec
+  rake benchmark

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'lorekeeper/fast_logger'
 
 module Lorekeeper
