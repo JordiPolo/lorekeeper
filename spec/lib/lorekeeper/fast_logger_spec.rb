@@ -61,6 +61,12 @@ RSpec.describe Lorekeeper::FastLogger do
     end
   end
 
+  describe '#silence' do
+    it 'silencing yields the code passed to it' do
+      expect{ |b| logger.silence(&b) }.to yield_with_no_args
+    end
+  end
+
   describe 'logging' do
     Lorekeeper::FastLogger::LOGGING_METHODS.each do |method|
       it "can log with the method #{method}" do
