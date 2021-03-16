@@ -1,3 +1,6 @@
+# 1.11.0
+* Support for activerecord-session_store v2 which calls only silence and not silence_logger
+
 # 1.10.0
 * Use ActiveSupport::BacktraceCleaner to reduce noise in stacktrace output
 

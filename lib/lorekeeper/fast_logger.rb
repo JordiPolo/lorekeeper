@@ -68,6 +68,11 @@ module Lorekeeper
       yield if block_given?
     end
 
+    # activerecord-session_store v2 is now simply calling silence instead of silence_logger
+    def silence(&block)
+      yield if block_given?
+    end
+
     # inherited classes probably want to reimplement this
     def log_data(_severity, message)
       @iodevice.write(message)
