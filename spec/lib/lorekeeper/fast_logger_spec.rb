@@ -7,6 +7,7 @@ RSpec.describe Lorekeeper::FastLogger do
   let(:io) { FakeIO.new }
   let(:logger) { described_class.new(io) }
   let(:message) { 'And think that I may never live to trace their shadows' }
+  let(:progname) { 'my_progname' }
 
   describe 'log levels' do
     LEVEL_CHECKERS =
@@ -52,6 +53,23 @@ RSpec.describe Lorekeeper::FastLogger do
       logger = described_class.new(filename)
       logger.error(message)
       expect(File.read(filename)).to eq(message)
+    end
+  end
+
+  describe '#add' do
+    it 'logs the message_param' do
+      expect(logger).to receive(:log_data).with(described_class::DEBUG, message)
+      logger.add(described_class::DEBUG, message, progname)
+    end
+
+    it 'logs the block if no message_param is given' do
+      expect(logger).to receive(:log_data).with(described_class::DEBUG, message)
+      logger.add(described_class::DEBUG, nil, progname) { message }
+    end
+
+    it 'logs the progname if no message and block are given' do
+      expect(logger).to receive(:log_data).with(described_class::DEBUG, progname)
+      logger.add(described_class::DEBUG, nil, progname)
     end
   end
 
