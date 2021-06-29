@@ -1,3 +1,6 @@
+# 1.11.1
+* Modify FastLogger#add to log progname as a message if no message and block are given
+
 # 1.11.0
 * Support for activerecord-session_store v2 which calls only silence and not silence_logger
 
