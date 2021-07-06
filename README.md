@@ -141,7 +141,7 @@ Will output:
 }
 ```
 
-This method also accepts a custom message, data and log level.
+This method also accepts a custom message, data and log level:
 
 ```ruby
 rescue => e
@@ -169,8 +169,22 @@ Will output:
 }
 ```
 
-Alternatively you can use named parameters:
+Please note that due to the way Ruby 2.x automatically converts Hash objects to keyword arguments when they come last,
+you need to explicitly use the `data` keyword argument when you don't pass any other argument afterwards:
 
+
+```ruby
+logger.exception(e, "custom msg!", { some: { data: 123 } })
+# => ArgumentError: unknown keyword: some
+
+logger.exception(e, "custom msg!", data: { some: { data: 123 } })
+# => works
+```
+
+Ruby 3.x is unaffected by this issue since the conversion is [not done automatically anymore](https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/).
+
+
+The available keyword arguments are `message`, `data` and `level`. They can be used instead of the fixed arguments:
 
 ```ruby
 rescue => e
@@ -178,7 +192,7 @@ rescue => e
 end
 ```
 
-This is specially useful when there is no custom message or data:
+This is especially useful when there is no custom message or data:
 
 ```ruby
 rescue => e
