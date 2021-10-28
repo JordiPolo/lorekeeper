@@ -98,7 +98,7 @@ module Lorekeeper
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
-    # Hardcording newrelic and active_support/callbacks now here.
+    # Hardcording newrelic, active_support/callbacks and zipkin-tracer now here.
     # In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
       @backtrace_cleaner&.clean(backtrace) || backtrace
@@ -121,7 +121,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
-    BLACKLISTED_FINGERPRINT = %r{newrelic_rpm|active_support/callbacks.rb}.freeze
+    BLACKLISTED_FINGERPRINT = %r{newrelic_rpm|active_support/callbacks.rb|zipkin-tracer}.freeze
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields

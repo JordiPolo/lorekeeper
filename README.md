@@ -1,6 +1,6 @@
 # Lorekeeper
 
-[![Build Status](https://travis-ci.org/JordiPolo/lorekeeper.svg?branch=master)](https://travis-ci.org/JordiPolo/lorekeeper)
+[![build](https://github.com/JordiPolo/lorekeeper/actions/workflows/build.yml/badge.svg)](https://github.com/JordiPolo/lorekeeper/actions/workflows/build.yml)
 
 LoreKeeper contains a highly optimized JSON logger. It outputs messages as JSON and let the users to add their own customized fields.
 When used without extra fields it outputs 20% faster than the standard Logger for messages not longer than one line of text.
