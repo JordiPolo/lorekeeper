@@ -1,3 +1,7 @@
+# 1.12.0
+* Remove ZipkinTracer information from stacktrace output
+* Move CI to GitHub Actions
+
 # 1.11.1
 * Modify FastLogger#add to log progname as a message if no message and block are given
 
