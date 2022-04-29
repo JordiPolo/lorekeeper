@@ -223,6 +223,24 @@ RSpec.describe Lorekeeper do
           end
         end
 
+        context 'Logging an exception with custom message and data in symbol key' do
+          let(:data_with_symbol_key) { { some: 'data' } }
+          let(:exception_data) do
+            base_message
+              .merge(
+                'exception' => "StandardError: #{exception_msg}",
+                'message' => message,
+                'stack' => stack
+              )
+              .merge(data_field)
+              .merge(error_level)
+          end
+          it 'Logs the exception with data in string key' do
+            logger.exception(exception, message: message, data: data_with_symbol_key)
+            expect(io.received_message).to eq(exception_data)
+          end
+        end
+
         context 'logging an exception without backtrace' do
           let(:stack) { [] }
           before do
