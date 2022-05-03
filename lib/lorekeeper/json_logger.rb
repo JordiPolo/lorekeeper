@@ -148,7 +148,7 @@ module Lorekeeper
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
       fields_to_log[LEVEL] = SEVERITY_NAMES_MAP[severity]
 
-      @iodevice.write(Oj.dump(fields_to_log) << "\n")
+      @iodevice.write(Oj.dump(fields_to_log, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
     end
   end
 end

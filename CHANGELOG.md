@@ -1,3 +1,8 @@
+# 2.0.0
+* Set `mode: :compat` in Oj.dump to stringify keys
+* Support Ruby 3.1
+* Drop support for Ruby < 2.5.0
+
 # 1.12.0
 * Remove ZipkinTracer information from stacktrace output
 * Move CI to GitHub Actions
