@@ -25,10 +25,19 @@ module Lorekeeper
       UNKNOWN => COLOR_LIGHT_GRAY
     }.freeze
 
+    JSON_LOGGER_METHODS = [
+      :current_fields,
+      :state,
+      :add_thread_unsafe_fields,
+      :remove_thread_unsafe_fields,
+      :add_fields,
+      :remove_fields
+    ].freeze
+
     # \e[colorm sets a color \e[0m resets all properties
     def log_data(severity, message)
       color = SEVERITY_TO_COLOR_MAP[severity]
-      @iodevice.write("\e[#{color}m#{message}\e[0m\n")
+      @iodevice.write("\e[#{color}m#{message.gsub('\n', "\n").gsub('\t', "\t")}\e[0m\n")
     end
 
     def inspect
@@ -43,16 +52,28 @@ module Lorekeeper
       end
     end
 
-    def exception(exception, custom_message = nil, custom_data = nil, level = :error)
-      log_level = METHOD_SEVERITY_MAP[level] || ERROR
+    # To not raise NoMethodError for the methods defined in JSONLogger
+    JSON_LOGGER_METHODS.each do |method_name|
+      define_method method_name, ->(*, &block) {}
+    end
+
+    def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
+                             message: nil, data: nil, level: nil)
+
+      param_level = level || custom_level
+      param_data = data || custom_data
+      param_message = message || custom_message
+
+      log_level = METHOD_SEVERITY_MAP[param_level] || ERROR
 
       if exception.is_a?(Exception)
-        backtrace = exception.backtrace || []
-        message = custom_message || exception.message
-        log_data(log_level, "#{exception.class}: #{exception.message}; #{message}, data: #{backtrace.join("\n")}")
+        message = param_message || exception.message
+        backtrace = "\n\nstack:\n#{exception.backtrace.join("\n")}" if exception.backtrace
+        data = "\n\ndata:\n#{param_data}" if param_data
+        log_data(log_level, "#{exception.class}: #{exception.message}; #{message} #{backtrace} #{data}")
       else
         log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
-        error_with_data("#{exception.class}: #{exception.inspect} #{custom_message}", custom_data)
+        error_with_data("#{exception.class}: #{exception.inspect} #{param_message}", param_data)
       end
     end
   end

@@ -18,6 +18,13 @@ RSpec.describe Lorekeeper::SimpleLogger do
     end
   end
 
+  describe '#log_data' do
+    it 'replaces \n and \t' do
+      logger.log_data(:info, 'line: 5, column: 27\n\tat io.swagger.v3.parser')
+      expect(io.received_message).to eq("\e[mline: 5, column: 27\n\tat io.swagger.v3.parser\e[0m\n")
+    end
+  end
+
   describe '#inspect' do
     it 'returns info about the logger itself' do
       expect(logger.inspect).to match(/\ALorekeeper Simple logger. IO: #<FakeIO/)
@@ -35,11 +42,14 @@ RSpec.describe Lorekeeper::SimpleLogger do
 
     context 'Logging just an exception' do
       let(:expected) do
-        "\e[31mStandardError: #{exception_msg}; #{exception_msg}, data: First line\nSecond line\e[0m\n"
+        "\e[31mStandardError: #{exception_msg}; #{exception_msg} \n\nstack:\nFirst line\nSecond line \e[0m\n"
       end
 
       it 'Falls back to ERROR if if the specified level is not recognized' do
         logger.exception(exception, nil, nil, :critical)
+        expect(io.received_message).to eq(expected)
+
+        logger.exception(exception, level: :critical)
         expect(io.received_message).to eq(expected)
       end
 
@@ -51,17 +61,36 @@ RSpec.describe Lorekeeper::SimpleLogger do
       it 'Logs the exception with a specified error level' do
         logger.exception(exception, nil, nil, :fatal)
         expect(io.received_message).to eq(expected)
+
+        logger.exception(exception, level: :fatal)
+        expect(io.received_message).to eq(expected)
       end
     end
 
     context 'with a custom message' do
       let(:custom_message) { 'some unreal condition happened' }
       let(:expected) do
-        "\e[31mStandardError: #{exception_msg}; #{custom_message}, data: First line\nSecond line\e[0m\n"
+        "\e[31mStandardError: #{exception_msg}; #{custom_message} \n\nstack:\nFirst line\nSecond line \e[0m\n"
       end
 
       it 'Logs the exception with the error level by default' do
         logger.exception(exception, custom_message)
+        expect(io.received_message).to eq(expected)
+
+        logger.exception(exception, message: custom_message)
+        expect(io.received_message).to eq(expected)
+      end
+    end
+
+    context 'with a custom_data' do
+      let(:custom_data) { { command: "java -jar openapi-generator.jar generate" }  }
+      let(:expected) do
+        "\e[31mStandardError: #{exception_msg}; #{exception_msg} \n\nstack:\nFirst line\nSecond line " \
+        "\n\ndata:\n{:command=>\"java -jar openapi-generator.jar generate\"}\e[0m\n"
+      end
+
+      it 'Logs the exception with the custom_data' do
+        logger.exception(exception, data: custom_data)
         expect(io.received_message).to eq(expected)
       end
     end
@@ -77,6 +106,14 @@ RSpec.describe Lorekeeper::SimpleLogger do
       it 'Logs the exception message' do
         logger.exception(message)
         expect(io.received_messages).to eq(expected)
+      end
+    end
+  end
+
+  describe 'JSONLogger methods' do
+    described_class::JSON_LOGGER_METHODS.each do |method|
+      it "does not raise NoMethodError for the #{method} method" do
+        expect { logger.send(method) }.to_not raise_error
       end
     end
   end
