@@ -25,15 +25,6 @@ module Lorekeeper
       UNKNOWN => COLOR_LIGHT_GRAY
     }.freeze
 
-    JSON_LOGGER_METHODS = [
-      :current_fields,
-      :state,
-      :add_thread_unsafe_fields,
-      :remove_thread_unsafe_fields,
-      :add_fields,
-      :remove_fields
-    ].freeze
-
     # \e[colorm sets a color \e[0m resets all properties
     def log_data(severity, message)
       color = SEVERITY_TO_COLOR_MAP[severity]
@@ -53,9 +44,12 @@ module Lorekeeper
     end
 
     # To not raise NoMethodError for the methods defined in JSONLogger
-    JSON_LOGGER_METHODS.each do |method_name|
-      define_method method_name, ->(*, &block) {}
-    end
+    def current_fields(*); end
+    def state(*); end
+    def add_thread_unsafe_fields(*); end
+    def remove_thread_unsafe_fields(*); end
+    def add_fields(*); end
+    def remove_fields(*); end
 
     def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
                              message: nil, data: nil, level: nil)

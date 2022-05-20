@@ -83,7 +83,7 @@ RSpec.describe Lorekeeper::SimpleLogger do
     end
 
     context 'with a custom_data' do
-      let(:custom_data) { { command: "java -jar openapi-generator.jar generate" }  }
+      let(:custom_data) { { command: "java -jar openapi-generator.jar generate" } }
       let(:expected) do
         "\e[31mStandardError: #{exception_msg}; #{exception_msg} \n\nstack:\nFirst line\nSecond line " \
         "\n\ndata:\n{:command=>\"java -jar openapi-generator.jar generate\"}\e[0m\n"
@@ -111,7 +111,9 @@ RSpec.describe Lorekeeper::SimpleLogger do
   end
 
   describe 'JSONLogger methods' do
-    described_class::JSON_LOGGER_METHODS.each do |method|
+    %i[
+      current_fields state add_thread_unsafe_fields remove_thread_unsafe_fields add_fields remove_fields
+    ].each do |method|
       it "does not raise NoMethodError for the #{method} method" do
         expect { logger.send(method) }.to_not raise_error
       end
