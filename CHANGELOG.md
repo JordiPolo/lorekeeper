@@ -1,3 +1,6 @@
+# 2.1.0
+* Modify SimpleLogger to properly log exceptions with named parameters
+
 # 2.0.0
 * Set `mode: :compat` in Oj.dump to stringify keys
 * Support Ruby 3.1
