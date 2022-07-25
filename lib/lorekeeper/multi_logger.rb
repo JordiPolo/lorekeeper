@@ -16,6 +16,17 @@ module Lorekeeper
       "Lorekeeper multilogger, loggers: #{@loggers.map(&:inspect)}"
     end
 
+    # Define all common logging methods within Multilogger to avoid NoMethodError
+    FastLogger::LOGGING_METHODS.each do |method_name|
+      define_method method_name.to_s, ->(*args, &block) do
+        call_loggers(method_name, *args, &block)
+      end
+
+      define_method "#{method_name}_with_data", ->(*args, &block) do
+        call_loggers(method_name, *args, &block)
+      end
+    end
+
 if RUBY_VERSION > "2.6"
     def respond_to?(method, all_included = false)
       @loggers.all? { |logger| logger.respond_to?(method, all_included) }
@@ -26,7 +37,7 @@ else
     end
 end
 
-    def method_missing(method, *args, &block)
+    def call_loggers(method, *args, &block)
       result = @loggers.map do |logger|
         logger.public_send(method, *args, &block) if logger.respond_to?(method)
       end
