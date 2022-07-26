@@ -8,7 +8,7 @@ module Lorekeeper
   class JSONLogger < FastLogger
     def initialize(file)
       reset_state
-      @base_fields = { MESSAGE => '', TIMESTAMP => '', LEVEL => '' }
+      @base_fields = { TIMESTAMP => '', MESSAGE => '', LEVEL => '' }
       @backtrace_cleaner = set_backtrace_cleaner
       super(file)
     end
