@@ -33,17 +33,9 @@ RSpec.describe Lorekeeper do
           logger.send(method, message)
           expect(io.received_message).to eq(expected.merge('level' => level_name.(method)))
         end
-        it 'The first key is timestamp' do
+        it 'preserves the order of keys' do
           logger.send(method, message)
-          expect(io.received_message.keys[0]).to eq('timestamp')
-        end
-        it 'The second key is message' do
-          logger.send(method, message)
-          expect(io.received_message.keys[1]).to eq('message')
-        end
-        it 'The third key is the level' do
-          logger.send(method, message)
-          expect(io.received_message.keys[2]).to eq('level')
+          expect(io.received_message.keys[0..2]).to eq(['timestamp', 'message', 'level'])
         end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
