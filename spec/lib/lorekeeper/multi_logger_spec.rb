@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Lorekeeper::MultiLogger do
   let(:io) { FakeIO.new }
-  let(:io2) { FakeIO.new }
+  let(:json_io) { FakeJSONIO.new }
   let(:logger) { described_class.new }
 
   context 'no loggers added' do
@@ -15,22 +15,22 @@ RSpec.describe Lorekeeper::MultiLogger do
 
   context 'loggers added' do
     let(:message) { 'My heart aches, and a drowsy numbness pains my sense' }
+    let(:console_logger) { Lorekeeper::SimpleLogger.new(io) }
+    let(:json_logger) { Lorekeeper::JSONLogger.new(json_io) }
 
-    before do
-      logger.add_logger(io)
-      logger.add_logger(io2)
-    end
+    it 'calls all the methods of the loggers' do
+      logger.add_logger(console_logger)
+      logger.add_logger(json_logger)
 
-    it 'calls the methods of the loggers' do
-      logger.write(message)
-      expect(io.received_message).to eq(message)
-      expect(io2.received_message).to eq(message)
-    end
+      Lorekeeper::FastLogger::LOGGING_METHODS.each do |log_level|
+        logger.send(log_level, message) if logger.respond_to? (log_level)
 
-    it 'does not call the methods if they do not exist' do
-      logger.idonotexist(message)
-      expect(io.received_message).to eq(nil)
-      expect(io2.received_message).to eq(nil)
+        expect(io.received_message).to include(message)
+        expect(json_io.received_message).to include(
+          'message' => message,
+          'level' => log_level == :warn ? 'warning' : log_level.to_s
+        )
+      end
     end
   end
 end
