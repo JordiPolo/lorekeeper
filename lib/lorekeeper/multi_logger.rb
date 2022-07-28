@@ -37,14 +37,8 @@ module Lorekeeper
 
     def fatal_with_data(*args, &block); call_loggers(:fatal, *args, &block); end
 
-    if RUBY_VERSION > '2.6'
-      def respond_to?(method, all_included: false)
-        @loggers.all? { |logger| logger.respond_to?(method, all_included) }
-      end
-    else
-      def respond_to?(method)
-        @loggers.all? { |logger| logger.respond_to?(method) }
-      end
+    def respond_to?(method, all_included: false)
+      @loggers.all? { |logger| logger.respond_to?(method, all_included) }
     end
 
     def call_loggers(method, *args, &block)
