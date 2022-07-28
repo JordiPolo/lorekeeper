@@ -8,7 +8,7 @@ RSpec.describe Lorekeeper do
   describe Lorekeeper::JSONLogger do
     let(:io) { FakeJSONIO.new }
     let(:current_time) { Time.utc(1897, 1, 1) }
-    let(:time_string) { '1897-01-01T00:00:00.000000Z'}
+    let(:time_string) { '1897-01-01T00:00:00.000000Z' }
     let(:level) { 'debug' }
     let(:error_level) { { 'level' => 'error' } }
     let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
@@ -16,7 +16,7 @@ RSpec.describe Lorekeeper do
     let(:base_message) { { 'message' => message, 'timestamp' => time_string, 'level' => level } }
     let(:data_field) { { 'data' => data } }
     let(:level_name) do
-      -> (method_sym) {
+      lambda { |method_sym|
         # 'warn' is logged as 'warning' so we need to look it up instead of using the method name... :facepalm:
         severity = described_class::METHOD_SEVERITY_MAP[method_sym]
         described_class::SEVERITY_NAMES_MAP[severity]
@@ -31,7 +31,7 @@ RSpec.describe Lorekeeper do
       described_class::LOGGING_METHODS.each do |method|
         it "Outputs the correct format for #{method}" do
           logger.send(method, message)
-          expect(io.received_message).to eq(expected.merge('level' => level_name.(method)))
+          expect(io.received_message).to eq(expected.merge('level' => level_name.call(method)))
         end
         it 'The first key is message' do
           logger.send(method, message)
@@ -47,7 +47,7 @@ RSpec.describe Lorekeeper do
         end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
-          expect(io.received_message).to eq(expected_data.merge('level' => level_name.(method)))
+          expect(io.received_message).to eq(expected_data.merge('level' => level_name.call(method)))
         end
       end
     end
@@ -77,7 +77,7 @@ RSpec.describe Lorekeeper do
             'message' => exception_msg,
             'stack' => stack
           )
-          .merge(error_level)
+                      .merge(error_level)
         end
         let(:new_backtrace) do
           [
@@ -99,7 +99,7 @@ RSpec.describe Lorekeeper do
 
         before do
           exception.set_backtrace(backtrace)
-          allow(Gem).to receive(:path).and_return(["/ruby/2.5.0"])
+          allow(Gem).to receive(:path).and_return(['/ruby/2.5.0'])
         end
 
         context 'Logging just an exception' do
@@ -128,9 +128,9 @@ RSpec.describe Lorekeeper do
             logger.exception(exception)
             logger.info(message)
             expect(io.received_messages).to eq([
-              exception_data,
-              base_message.merge('level' => 'info')
-            ])
+                                                 exception_data,
+                                                 base_message.merge('level' => 'info')
+                                               ])
           end
 
           it 'Does not log Newrelic instrumentation information and active_support callbacks' do
@@ -138,18 +138,18 @@ RSpec.describe Lorekeeper do
             logger.exception(exception)
 
             no_newrelic_backtrace = if ActiveSupport::VERSION::MAJOR < 6
-                [
-                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-                  "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-                ]
-              else
-                [
-                  "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-                  "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-                  "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-                ]
-              end
+                                      [
+                                        "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                                        "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                                        "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'"
+                                      ]
+                                    else
+                                      [
+                                        "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                                        "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                                        "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'"
+                                      ]
+                                    end
             expected = exception_data.merge('stack' => no_newrelic_backtrace)
 
             expect(io.received_message).to eq(expected)
@@ -192,7 +192,7 @@ RSpec.describe Lorekeeper do
               'message' => message,
               'stack' => stack
             )
-            .merge(error_level)
+                        .merge(error_level)
           end
           it 'Logs the exception' do
             logger.exception(exception, message)
@@ -408,7 +408,7 @@ RSpec.describe Lorekeeper do
 
       describe '#inspect' do
         it 'returns info about the logger itself' do
-          expect(logger.inspect).to eq("Lorekeeper JSON logger. IO: nil")
+          expect(logger.inspect).to eq('Lorekeeper JSON logger. IO: nil')
         end
       end
 

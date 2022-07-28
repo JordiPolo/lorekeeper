@@ -24,7 +24,7 @@ RSpec.describe Lorekeeper::FastLogger do
           { debug?: false, info?: false, warn?: false, error?: true, fatal?: true },
         described_class::FATAL =>
           { debug?: false, info?: false, warn?: false, error?: false, fatal?: true }
-      }
+      }.freeze
     LEVEL_CHECKERS.each_pair do |log_level, checkers|
       it "level checkers return correct values for #{log_level}" do
         logger.level = log_level
@@ -48,7 +48,7 @@ RSpec.describe Lorekeeper::FastLogger do
     end
 
     it 'creates files for writing if they do not exist' do
-      filename = "/tmp/non_existent_file"
+      filename = '/tmp/non_existent_file'
       File.delete(filename) if File.exist?(filename)
       logger = described_class.new(filename)
       logger.error(message)
@@ -75,13 +75,13 @@ RSpec.describe Lorekeeper::FastLogger do
 
   describe '#silence_logger' do
     it 'silencing yields the code passed to it' do
-      expect{ |b| logger.silence_logger(&b) }.to yield_with_no_args
+      expect { |b| logger.silence_logger(&b) }.to yield_with_no_args
     end
   end
 
   describe '#silence' do
     it 'silencing yields the code passed to it' do
-      expect{ |b| logger.silence(&b) }.to yield_with_no_args
+      expect { |b| logger.silence(&b) }.to yield_with_no_args
     end
   end
 

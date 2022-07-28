@@ -28,13 +28,14 @@ module Lorekeeper
     # Delegates methods to the existing Logger instance
     # We are extending the logger API with methods error_with_data, etc
     LOGGING_METHODS.each do |method_name|
-      define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) do
+      define_method "#{method_name}_with_data", lambda { |message_param = nil, data = {}, &block|
         return true if METHOD_SEVERITY_MAP[method_name] < @level
+
         extra_fields = { DATA => (data || {}) }
-        with_extra_fields(extra_fields) { # Using do/end here only valid on Ruby>= 2.3
+        with_extra_fields(extra_fields) do # Using do/end here only valid on Ruby>= 2.3
           add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
-        }
-      end
+        end
+      }
     end
 
     def add_thread_unsafe_fields(fields)
@@ -65,7 +66,7 @@ module Lorekeeper
     # By default message comes from exception.message
     # Optional and named parameters to overwrite message, level and add data
     def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
-                             message: nil, data: nil, level: nil) # Backwards compatible named params
+                  message: nil, data: nil, level: nil) # Backwards compatible named params
 
       param_level = level || custom_level
       param_data = data || custom_data
@@ -139,10 +140,10 @@ module Lorekeeper
       current_state = state # Accessing state is slow. Do it only once per call.
       # merging is slow, we do not want to merge with empty hash if possible
       fields_to_log = if current_state[:extra_fields].empty?
-        current_state[:base_fields]
-      else
-        current_state[:base_fields].merge(current_state[:extra_fields])
-      end
+                        current_state[:base_fields]
+                      else
+                        current_state[:base_fields].merge(current_state[:extra_fields])
+                      end
 
       fields_to_log[MESSAGE] = message
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)

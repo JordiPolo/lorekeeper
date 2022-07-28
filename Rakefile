@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'benchmark'
 require 'tempfile'
 require 'securerandom'
@@ -5,7 +7,7 @@ require 'benchmark/ips'
 require 'byebug'
 require 'rbtrace'
 
-$LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('lib', __dir__))
 $LOAD_PATH.uniq!
 
 require 'lorekeeper'

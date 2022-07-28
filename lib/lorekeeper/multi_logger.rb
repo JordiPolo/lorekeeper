@@ -16,15 +16,15 @@ module Lorekeeper
       "Lorekeeper multilogger, loggers: #{@loggers.map(&:inspect)}"
     end
 
-if RUBY_VERSION > "2.6"
-    def respond_to?(method, all_included = false)
-      @loggers.all? { |logger| logger.respond_to?(method, all_included) }
+    if RUBY_VERSION > '2.6'
+      def respond_to?(method, all_included = false)
+        @loggers.all? { |logger| logger.respond_to?(method, all_included) }
+      end
+    else
+      def respond_to?(method)
+        @loggers.all? { |logger| logger.respond_to?(method) }
+      end
     end
-else
-    def respond_to?(method)
-      @loggers.all? { |logger| logger.respond_to?(method) }
-    end
-end
 
     def method_missing(method, *args, &block)
       result = @loggers.map do |logger|
