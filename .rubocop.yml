@@ -1,6 +1,31 @@
+AllCops:
+  Exclude:
+  - '**/*.gemspec'
+  IgnoredMethods:
+  - exception
 Metrics/LineLength:
   Max: 120
 # https://github.com/rubocop/rubocop/blob/20990ed3831589c0d9f202107b1b580ead8ef2c5/lib/rubocop/cop/style/single_line_methods.rb#L11
 # TODO: add "EnforcedStyle: allow_single_line" once all rubys are > 3.0 to autocorrect all single-line methods to endless
 Style/SingleLineMethods:
   Enabled: false
+Metrics/BlockLength:
+  Max: 25
+  IgnoredMethods:
+    - context
+    - describe
+    - it
+    - shared_examples
+    - shared_examples_for
+    - exception
+Layout/LineLength:
+  Exclude:
+    - 'spec/lib/lorekeeper/json_logger_spec.rb'
+  Max: 120
+  IgnoredMethods:
+    - context
+    - describe
+    - it
+    - shared_examples
+    - shared_examples_for
+    - exception
