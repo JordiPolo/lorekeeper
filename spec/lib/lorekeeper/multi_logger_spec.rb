@@ -18,7 +18,7 @@ RSpec.describe Lorekeeper::MultiLogger do
     let(:console_logger) { Lorekeeper::SimpleLogger.new(io) }
     let(:json_logger) { Lorekeeper::JSONLogger.new(json_io) }
 
-    it 'calls all the methods of the loggers' do
+    it 'calls all log level methods of loggers' do
       logger.add_logger(console_logger)
       logger.add_logger(json_logger)
 
@@ -31,6 +31,12 @@ RSpec.describe Lorekeeper::MultiLogger do
           'level' => log_level == :warn ? 'warning' : log_level.to_s
         )
       end
+    end
+
+    it 'calls write method of loggers' do
+      logger.write(message)
+      expect(io.received_message).to eq(message)
+      expect(io2.received_message).to eq(message)
     end
   end
 end

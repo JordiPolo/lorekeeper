@@ -37,6 +37,8 @@ module Lorekeeper
 
     def fatal_with_data(*args, &block); call_loggers(:fatal, *args, &block); end
 
+    def write(*args, &block); call_loggers(:write, *args, &block); end
+
     def respond_to?(method, all_included: false)
       @loggers.all? { |logger| logger.respond_to?(method, all_included) }
     end
