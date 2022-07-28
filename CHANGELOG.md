@@ -1,3 +1,7 @@
+# 2.2.0
+* Remove metaprogramming from MultiLogger
+* Drop support for Ruby < 2.7.0
+
 # 2.1.0
 * Modify SimpleLogger to properly log exceptions with named parameters
 
