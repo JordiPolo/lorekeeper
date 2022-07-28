@@ -17,6 +17,7 @@ RSpec.describe Lorekeeper::MultiLogger do
     let(:message) { 'My heart aches, and a drowsy numbness pains my sense' }
     let(:console_logger) { Lorekeeper::SimpleLogger.new(io) }
     let(:json_logger) { Lorekeeper::JSONLogger.new(json_io) }
+    let(:fakeio) { FakeIO.new }
 
     it 'calls all log level methods of loggers' do
       logger.add_logger(console_logger)
@@ -34,9 +35,10 @@ RSpec.describe Lorekeeper::MultiLogger do
     end
 
     it 'calls write method of loggers' do
+      logger.add_logger(fakeio)
+
       logger.write(message)
-      expect(io.received_message).to eq(message)
-      expect(io2.received_message).to eq(message)
+      expect(fakeio.received_message).to eq(message)
     end
   end
 end
