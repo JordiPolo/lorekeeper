@@ -56,7 +56,7 @@ module Lorekeeper
     # This is part of the standard Logger API, we need this to be compatible
     def add(severity, message_param = nil, progname = nil, &block)
       return true if severity < @level
-      message = message_param || (block && block.call) || progname
+      message = (block && block.call) || message_param || progname
       log_data(severity, message.freeze)
     end
 
