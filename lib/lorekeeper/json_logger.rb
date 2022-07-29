@@ -126,6 +126,7 @@ module Lorekeeper
     def with_extra_fields(fields)
       state[:extra_fields] = fields
       yield
+    ensure
       state[:extra_fields] = {}
     end
 
