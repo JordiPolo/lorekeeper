@@ -1,3 +1,6 @@
+# 2.2.1
+* Fix MultiLogger to not raise NoMethodError for the methods defined in JSONLogger
+
 # 2.2.0
 * Remove metaprogramming from MultiLogger
 * Drop support for Ruby < 2.7.0
