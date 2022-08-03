@@ -1,5 +1,5 @@
 # 2.2.1
-* Fix MultiLogger to not raise NoMethodError for the methods defined in JSONLogger
+* Fix MultiLogger to not raise NoMethodError
 
 # 2.2.0
 * Remove metaprogramming from MultiLogger

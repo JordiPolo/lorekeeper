@@ -37,20 +37,6 @@ module Lorekeeper
 
     def fatal_with_data(*args, &block); call_loggers(:fatal, *args, &block); end
 
-    def current_fields; call_loggers(:current_fields); end
-
-    def state; call_loggers(:state); end
-
-    def reset_state; call_loggers(:reset_state); end
-
-    def add_thread_unsafe_fields(*args); call_loggers(:add_thread_unsafe_fields, *args); end
-
-    def remove_thread_unsafe_fields(*args); call_loggers(:remove_thread_unsafe_fields, *args); end
-
-    def add_fields(*args); call_loggers(:add_fields, *args); end
-
-    def remove_fields(*args); call_loggers(:remove_fields, *args); end
-
     def write(*args); call_loggers(:write, *args); end
 
     def respond_to?(method, all_included: false)
@@ -64,6 +50,10 @@ module Lorekeeper
       # We call all the methods, delete nils and duplicates.
       # Then hope for the best taking the first value
       result.compact.uniq.first
+    end
+
+    def method_missing(method, *args, &block)
+      call_loggers(method, *args, &block)
     end
   end
 end
