@@ -8,6 +8,8 @@ RSpec.describe Lorekeeper::SimpleLogger do
   let(:logger) { described_class.new(io) }
   let(:message) { 'Blazing Hyperion on his orbed fire still sat' }
 
+  it_behaves_like 'Lorekeeper loggers'
+
   describe 'logging' do
     described_class::LOGGING_METHODS.each do |method|
       it "can log with the method #{method}" do

@@ -50,6 +50,7 @@ RSpec.describe Lorekeeper do
       let(:expected_data) { base_message.merge(data_field) }
 
       it_behaves_like 'Logging methods'
+      it_behaves_like 'Lorekeeper loggers'
 
       describe '#inspect' do
         it 'returns info about the logger itself' do
@@ -91,7 +92,7 @@ RSpec.describe Lorekeeper do
 
         before do
           exception.set_backtrace(backtrace)
-          allow(Gem).to receive(:path).and_return(["/ruby/2.5.0"])
+          allow(Gem).to receive(:path).and_return(['/ruby/2.5.0'])
         end
 
         context 'Logging just an exception' do
