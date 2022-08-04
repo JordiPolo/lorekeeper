@@ -51,5 +51,9 @@ module Lorekeeper
       # Then hope for the best taking the first value
       result.compact.uniq.first
     end
+
+    def method_missing(method, *args, &block)
+      call_loggers(method, *args, &block)
+    end
   end
 end
