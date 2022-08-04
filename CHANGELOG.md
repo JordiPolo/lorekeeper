@@ -1,5 +1,5 @@
 # 2.3.1
-* Add write method support to all loggers
+* Add `#write` method support to all loggers
 
 # 2.2.1
 * Fix MultiLogger to not raise NoMethodError
