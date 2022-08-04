@@ -28,7 +28,7 @@ RSpec.describe Lorekeeper::FastLogger do
           { debug?: false, info?: false, warn?: false, error?: false, fatal?: true }
       }
     LEVEL_CHECKERS.each_pair do |log_level, checkers|
-      it 'level checkers return correct values for #{log_level}' do
+      it "level checkers return correct values for #{log_level}" do
         logger.level = log_level
         checkers.each_pair do |method, result|
           expect(logger.send(method)).to eq(result)
@@ -89,7 +89,7 @@ RSpec.describe Lorekeeper::FastLogger do
 
   describe 'logging' do
     Lorekeeper::FastLogger::LOGGING_METHODS.each do |method|
-      it 'can log with the method #{method}' do
+      it "can log with the method #{method}" do
         logger.send(method, message)
         expect(io.received_message).to eq(message)
       end
