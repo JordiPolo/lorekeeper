@@ -24,13 +24,23 @@ RSpec.describe Lorekeeper::MultiLogger do
       logger.add_logger(json_logger)
 
       Lorekeeper::FastLogger::LOGGING_METHODS.each do |log_level|
-        logger.send(log_level, message) if logger.respond_to? (log_level)
+        logger.send(log_level, message)
 
         expect(io.received_message).to include(message)
         expect(json_io.received_message).to include(
           'message' => message,
           'level' => log_level == :warn ? 'warning' : log_level.to_s
         )
+      end
+    end
+
+    %i[
+      current_fields state add_thread_unsafe_fields remove_thread_unsafe_fields add_fields remove_fields
+    ].each do |method|
+      it "does not raise NoMethodError for the #{method} method" do
+        logger.add_logger(console_logger)
+
+        expect { logger.send(method) }.to_not raise_error
       end
     end
 
