@@ -31,10 +31,6 @@ module Lorekeeper
       write("\e[#{color}m#{message.gsub('\n', "\n").gsub('\t', "\t")}\e[0m\n")
     end
 
-    def write(message)
-      @iodevice.write(message)
-    end
-
     def inspect
       "Lorekeeper Simple logger. IO: #{@file.inspect}"
     end
