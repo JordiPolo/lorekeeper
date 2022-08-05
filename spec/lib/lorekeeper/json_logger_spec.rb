@@ -268,6 +268,13 @@ RSpec.describe Lorekeeper do
         end
       end
 
+      describe '#write' do
+        it 'writes a parsable JSON message' do
+          logger.write(message)
+          expect(io.received_message).to eq(message)
+        end
+      end
+
       context 'Added some thread safe fields' do
         let(:new_fields) { { 'planet' => 'hyperion' } }
         let(:expected) { base_message.merge(new_fields) }

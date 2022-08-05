@@ -93,4 +93,11 @@ RSpec.describe Lorekeeper::FastLogger do
       end
     end
   end
+
+  describe '#write' do
+    it 'writes message to io' do
+      logger.write(message)
+      expect(io.received_message).to eq(message)
+    end
+  end
 end
