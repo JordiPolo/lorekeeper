@@ -9,8 +9,6 @@ RSpec.describe Lorekeeper::FastLogger do
   let(:message) { 'And think that I may never live to trace their shadows' }
   let(:progname) { 'my_progname' }
 
-  it_behaves_like 'Lorekeeper loggers'
-
   describe 'log levels' do
     LEVEL_CHECKERS =
       {

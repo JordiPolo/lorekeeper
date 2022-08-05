@@ -50,7 +50,6 @@ RSpec.describe Lorekeeper do
       let(:expected_data) { base_message.merge(data_field) }
 
       it_behaves_like 'Logging methods'
-      it_behaves_like 'Lorekeeper loggers'
 
       describe '#inspect' do
         it 'returns info about the logger itself' do

@@ -9,7 +9,6 @@ require_relative 'support/fake_io'
 require 'lorekeeper'
 require 'timecop'
 require 'byebug'
-require 'support/shared_examples/lorekeeper_loggers'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
