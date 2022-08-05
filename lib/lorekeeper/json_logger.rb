@@ -95,7 +95,7 @@ module Lorekeeper
     end
 
     def write(message)
-      @iodevice.write(Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
+      super(Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
     end
 
     private
