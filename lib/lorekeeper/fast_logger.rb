@@ -75,6 +75,10 @@ module Lorekeeper
 
     # inherited classes probably want to reimplement this
     def log_data(_severity, message)
+      write(message)
+    end
+
+    def write(message)
       @iodevice.write(message)
     end
 

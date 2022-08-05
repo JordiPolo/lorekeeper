@@ -91,7 +91,7 @@ RSpec.describe Lorekeeper do
 
         before do
           exception.set_backtrace(backtrace)
-          allow(Gem).to receive(:path).and_return(["/ruby/2.5.0"])
+          allow(Gem).to receive(:path).and_return(['/ruby/2.5.0'])
         end
 
         context 'Logging just an exception' do
@@ -265,6 +265,13 @@ RSpec.describe Lorekeeper do
             logger.exception(message, message: 'second part not good', data: { 'planet' => 'hyperion' })
             expect(io.received_messages).to eq(base_message)
           end
+        end
+      end
+
+      describe '#write' do
+        it 'writes a parsable JSON message' do
+          logger.write(message)
+          expect(io.received_message).to eq(message)
         end
       end
 

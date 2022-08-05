@@ -48,7 +48,7 @@ RSpec.describe Lorekeeper::FastLogger do
     end
 
     it 'creates files for writing if they do not exist' do
-      filename = "/tmp/non_existent_file"
+      filename = '/tmp/non_existent_file'
       File.delete(filename) if File.exist?(filename)
       logger = described_class.new(filename)
       logger.error(message)
@@ -91,6 +91,13 @@ RSpec.describe Lorekeeper::FastLogger do
         logger.send(method, message)
         expect(io.received_message).to eq(message)
       end
+    end
+  end
+
+  describe '#write' do
+    it 'writes message to io' do
+      logger.write(message)
+      expect(io.received_message).to eq(message)
     end
   end
 end
