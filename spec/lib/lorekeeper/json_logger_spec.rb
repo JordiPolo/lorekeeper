@@ -78,17 +78,17 @@ RSpec.describe Lorekeeper do
             "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in
             `call'",
             "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
-            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in
-            `call'",
+            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb" \
+            ":92:in`call'",
             "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
             "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
-            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in
-            `call'",
-            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29:in `block (3 levels) in
-            call'",
+            "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb" \
+            ":92:in `call'",
+            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29" \
+            ":in `block (3 levels) in call'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:51:in `trace!'",
-            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29:in `block (2 levels) in
-            call'",
+            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29" \
+            ":in `block (2 levels) incall'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/zipkin_sender_base.rb:17:in `with_new_span'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:27:in `block in call'"
           ]
