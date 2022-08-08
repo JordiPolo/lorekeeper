@@ -1,9 +1,13 @@
 AllCops:
   NewCops: enable
   Exclude:
-    - "vendor/bundle/**/*"
     - "log/**/*"
     - "*gemspec"
+  # NOTE: Excludes vendor from linting. Needed by GitHub Actions.
+  # - https://github.com/rubocop/rubocop/issues/9832#issuecomment-873398952
+  #
+    - "vendor/bundle/**/*"
+
 
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
