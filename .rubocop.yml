@@ -1,6 +1,7 @@
 AllCops:
   NewCops: enable
   Exclude:
+    - "vendor/bundle/**/*"
     - "cache/**/*"
     - "db/**/*"
     - "log/**/*"
