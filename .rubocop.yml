@@ -2,9 +2,8 @@ AllCops:
   NewCops: enable
   Exclude:
     - "vendor/bundle/**/*"
-    - "cache/**/*"
-    - "db/**/*"
     - "log/**/*"
+    - "*gemspec"
 
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
