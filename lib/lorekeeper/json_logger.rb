@@ -136,7 +136,7 @@ module Lorekeeper
 
     def remove_invalid_fields(fields)
       fields.delete_if do |_, v|
-        v.nil? || v.respond_to?(:empty?) && v.empty?
+        v.nil? || (v.respond_to?(:empty?) && v.empty?)
       end
     end
 

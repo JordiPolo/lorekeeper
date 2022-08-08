@@ -86,7 +86,7 @@ RSpec.describe Lorekeeper::SimpleLogger do
       let(:custom_data) { { command: 'java -jar openapi-generator.jar generate' } }
       let(:expected) do
         "\e[31mStandardError: #{exception_msg}; #{exception_msg} \n\nstack:\nFirst line\nSecond line " \
-        "\n\ndata:\n{:command=>\"java -jar openapi-generator.jar generate\"}\e[0m\n"
+          "\n\ndata:\n{:command=>\"java -jar openapi-generator.jar generate\"}\e[0m\n"
       end
 
       it 'Logs the exception with the custom_data' do
