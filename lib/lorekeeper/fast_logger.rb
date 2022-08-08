@@ -61,7 +61,7 @@ module Lorekeeper
     # We define the behaviour of all the usual logging methods
     # We support a string as a parameter and also a block
     LOGGING_METHODS.each do |method_name|
-      define_method method_name.to_s, lambda { |message_param = nil, &block|
+      define_method method_name.to_s, ->(message_param = nil, &block) {
         add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
       }
     end

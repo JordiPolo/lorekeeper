@@ -37,7 +37,7 @@ module Lorekeeper
 
     # Extending the logger API with methods error_with_data, etc
     LOGGING_METHODS.each do |method_name|
-      define_method "#{method_name}_with_data", lambda { |message_param = nil, data = {}|
+      define_method "#{method_name}_with_data", ->(message_param = nil, data = {}) {
         return true if METHOD_SEVERITY_MAP[method_name] < @level
 
         log_data(METHOD_SEVERITY_MAP[method_name], "#{message_param}, data: #{data}")
@@ -58,7 +58,7 @@ module Lorekeeper
     def remove_fields(*); end
 
     def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
-                  message: nil, data: nil, level: nil)
+      message: nil, data: nil, level: nil)
 
       param_level = level || custom_level
       param_data = data || custom_data

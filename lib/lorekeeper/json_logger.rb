@@ -28,7 +28,7 @@ module Lorekeeper
     # Delegates methods to the existing Logger instance
     # We are extending the logger API with methods error_with_data, etc
     LOGGING_METHODS.each do |method_name|
-      define_method "#{method_name}_with_data", lambda { |message_param = nil, data = {}, &block|
+      define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) {
         return true if METHOD_SEVERITY_MAP[method_name] < @level
 
         extra_fields = { DATA => (data || {}) }
@@ -66,7 +66,7 @@ module Lorekeeper
     # By default message comes from exception.message
     # Optional and named parameters to overwrite message, level and add data
     def exception(exception, custom_message = nil, custom_data = nil, custom_level = :error,
-                  message: nil, data: nil, level: nil) # Backwards compatible named params
+      message: nil, data: nil, level: nil) # Backwards compatible named params
 
       param_level = level || custom_level
       param_data = data || custom_data
