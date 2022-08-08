@@ -8,7 +8,7 @@ module Lorekeeper
   class JSONLogger < FastLogger
     def initialize(file)
       reset_state
-      @base_fields = { MESSAGE => '', TIMESTAMP => '', LEVEL => '' }
+      @base_fields = { TIMESTAMP => '', MESSAGE => '', LEVEL => '' }
       @backtrace_cleaner = set_backtrace_cleaner
       super(file)
     end
@@ -95,6 +95,10 @@ module Lorekeeper
       "Lorekeeper JSON logger. IO: #{@file.inspect}"
     end
 
+    def write(message)
+      super(Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
+    end
+
     private
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
@@ -149,7 +153,7 @@ module Lorekeeper
       fields_to_log[TIMESTAMP] = Time.now.utc.strftime(DATE_FORMAT)
       fields_to_log[LEVEL] = SEVERITY_NAMES_MAP[severity]
 
-      @iodevice.write(Oj.dump(fields_to_log, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
+      write(fields_to_log)
     end
   end
 end

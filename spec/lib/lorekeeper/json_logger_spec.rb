@@ -33,17 +33,9 @@ RSpec.describe Lorekeeper do
           logger.send(method, message)
           expect(io.received_message).to eq(expected.merge('level' => level_name.call(method)))
         end
-        it 'The first key is message' do
+        it 'preserves the order of keys' do
           logger.send(method, message)
-          expect(io.received_message.keys[0]).to eq('message')
-        end
-        it 'The second key is the timestamp' do
-          logger.send(method, message)
-          expect(io.received_message.keys[1]).to eq('timestamp')
-        end
-        it 'The third key is the level' do
-          logger.send(method, message)
-          expect(io.received_message.keys[2]).to eq('level')
+          expect(io.received_message.keys[0..2]).to eq(%w[timestamp message level])
         end
         it "Outputs the correct format for #{method}_with_data" do
           logger.send("#{method}_with_data", message, data)
@@ -273,6 +265,13 @@ RSpec.describe Lorekeeper do
             logger.exception(message, message: 'second part not good', data: { 'planet' => 'hyperion' })
             expect(io.received_messages).to eq(base_message)
           end
+        end
+      end
+
+      describe '#write' do
+        it 'writes a parsable JSON message' do
+          logger.write(message)
+          expect(io.received_message).to eq(message)
         end
       end
 
