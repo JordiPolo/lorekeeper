@@ -9,25 +9,11 @@ module Lorekeeper
     attr_accessor :level,      # Current level, default: DEBUG
                   :formatter   # Just for compatibility with Logger, not used
 
-    def debug?
-      level <= DEBUG
-    end
-
-    def info?
-      level <= INFO
-    end
-
-    def warn?
-      level <= WARN
-    end
-
-    def error?
-      level <= ERROR
-    end
-
-    def fatal?
-      level <= FATAL
-    end
+    def debug?; level <= DEBUG; end
+    def info?; level <= INFO; end
+    def warn?; level <= WARN; end
+    def error?; level <= ERROR; end
+    def fatal?; level <= FATAL; end
 
     def initialize(file)
       @level = DEBUG
@@ -62,9 +48,9 @@ module Lorekeeper
     # We define the behaviour of all the usual logging methods
     # We support a string as a parameter and also a block
     LOGGING_METHODS.each do |method_name|
-      define_method method_name.to_s, ->(message_param = nil, &block) {
+      define_method method_name.to_s, ->(message_param = nil, &block) do
         add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
-      }
+      end
     end
 
     # This is part of the standard Logger API, we need this to be compatible
@@ -75,18 +61,21 @@ module Lorekeeper
       log_data(severity, message.freeze)
     end
 
+    # rubocop:disable Lint/UnusedMethodArgument
+    #
     # Some gems like to add this method. For instance:
     # https://github.com/rails/activerecord-session_store
     # To avoid needing to monkey-patch Lorekeeper just to get this method, we are adding a simple
     # non-functional version here.
-    def silence_logger
+    def silence_logger(&block)
       yield if block_given?
     end
 
     # activerecord-session_store v2 is now simply calling silence instead of silence_logger
-    def silence
+    def silence(&block)
       yield if block_given?
     end
+    # rubocop:enable Lint/UnusedMethodArgument
 
     # inherited classes probably want to reimplement this
     def log_data(_severity, message)
@@ -123,11 +112,12 @@ module Lorekeeper
       def to_iodevice(file)
         return nil unless file
 
-        iodevice = if file.respond_to?(:write) && file.respond_to?(:close)
-                     file
-                   else
-                     open_logfile(file)
-                   end
+        iodevice =
+          if file.respond_to?(:write) && file.respond_to?(:close)
+            file
+          else
+            open_logfile(file)
+          end
 
         iodevice.sync = true if iodevice.respond_to?(:sync=)
         iodevice
