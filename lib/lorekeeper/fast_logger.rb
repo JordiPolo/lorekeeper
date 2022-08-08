@@ -6,7 +6,8 @@ module Lorekeeper
   # Very simple, very fast logger
   class FastLogger
     include ::Logger::Severity # contains the levels constants: DEBUG, ERROR, etc.
-    attr_accessor :level, :formatter # Current level, default: DEBUG    # Just for compatibility with Logger, not used
+    attr_accessor :level,      # Current level, default: DEBUG
+                  :formatter   # Just for compatibility with Logger, not used
 
     def debug?
       level <= DEBUG
