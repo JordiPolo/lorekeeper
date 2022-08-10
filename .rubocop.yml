@@ -1,102 +1,16 @@
+inherit_gem:
+  rubocop-mdsol: rubocop.yml
+
 AllCops:
-  NewCops: enable
   Exclude:
-    - "log/**/*"
     - "*gemspec"
   # NOTE: Excludes vendor from linting. Needed by GitHub Actions.
   # - https://github.com/rubocop/rubocop/issues/9832#issuecomment-873398952
   #
     - "vendor/bundle/**/*"
 
-
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
-
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - "spec/**/*"
-
-Lint/ConstantDefinitionInBlock:
-  Exclude:
-    - "spec/**/*"
-
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-
-Layout/LineLength:
-  Max: 120
-
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-
-Metrics/AbcSize:
-  Max: 30
-
-Metrics/BlockLength:
-  Exclude:
-    - "spec/**/*"
-
-Metrics/ClassLength:
-  Enabled: false
-
-Metrics/CyclomaticComplexity:
-  Enabled: false
-
-Metrics/MethodLength:
-  Max: 30
-
-Metrics/PerceivedComplexity:
-  Enabled: false
-
 Metrics/ParameterLists:
   CountKeywordArgs: false
-
-Naming/FileName:
-  Exclude:
-    - Appraisals
-
-# allow non ASCII characters in comments
-Style/AsciiComments:
-  Enabled: false
-
-Style/ClassAndModuleChildren:
-  Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/ExponentialNotation:
-  Enabled: false
-
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
-Style/IfUnlessModifier:
-  Enabled: false
-
-Style/Lambda:
-  EnforcedStyle: literal
-
-Style/LambdaCall:
-  Enabled: false
-
-Style/PerlBackrefs:
-  Enabled: false
-
-Style/RescueModifier:
-  Enabled: false
-
-Style/RescueStandardError:
-  EnforcedStyle: implicit
-
-Style/SignalException:
-  EnforcedStyle: only_raise
-
-Style/StringLiterals:
-  Enabled: false
-
-Style/StringLiteralsInInterpolation:
-  Enabled: false
 
 # TODO: add "EnforcedStyle: allow_single_line" once all rubys are > 3.0 to autocorrect all single-line methods to endless
 # https://github.com/rubocop/rubocop/blob/20990ed3831589c0d9f202107b1b580ead8ef2c5/lib/rubocop/cop/style/single_line_methods.rb#L11
@@ -106,3 +20,7 @@ Style/SingleLineMethods:
 
 Style/MissingRespondToMissing:
   Enabled: false
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - "spec/**/*"
