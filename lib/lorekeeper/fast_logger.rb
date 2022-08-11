@@ -61,21 +61,18 @@ module Lorekeeper
       log_data(severity, message.freeze)
     end
 
-    # rubocop:disable Lint/UnusedMethodArgument
-    #
     # Some gems like to add this method. For instance:
     # https://github.com/rails/activerecord-session_store
     # To avoid needing to monkey-patch Lorekeeper just to get this method, we are adding a simple
     # non-functional version here.
     def silence_logger(&block)
-      yield if block_given?
+      yield if block
     end
 
     # activerecord-session_store v2 is now simply calling silence instead of silence_logger
     def silence(&block)
-      yield if block_given?
+      yield if block
     end
-    # rubocop:enable Lint/UnusedMethodArgument
 
     # inherited classes probably want to reimplement this
     def log_data(_severity, message)
