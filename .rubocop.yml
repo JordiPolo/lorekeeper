@@ -3,11 +3,21 @@ inherit_gem:
 
 AllCops:
   Exclude:
-    - "*gemspec"
+    - '*gemspec'
   # NOTE: Excludes vendor from linting. Needed by GitHub Actions.
   # - https://github.com/rubocop/rubocop/issues/9832#issuecomment-873398952
   #
-    - "vendor/bundle/**/*"
+    - 'vendor/bundle/**/*'
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - 'spec/**/*'
+
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
@@ -21,6 +31,9 @@ Style/SingleLineMethods:
 Style/MissingRespondToMissing:
   Enabled: false
 
-Lint/ConstantDefinitionInBlock:
-  Exclude:
-    - "spec/**/*"
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: single_quotes
