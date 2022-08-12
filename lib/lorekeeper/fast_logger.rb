@@ -132,5 +132,7 @@ module Lorekeeper
         open_logfile(filename)
       end
     end
+
+    private_constant :LogDeviceMutex, :LogDevice
   end
 end
