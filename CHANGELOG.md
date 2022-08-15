@@ -1,4 +1,4 @@
-# 2.3.0
+# Unreleased
 * Add `#write` method support to all loggers
 
 # 2.2.1
