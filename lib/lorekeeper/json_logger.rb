@@ -96,7 +96,16 @@ module Lorekeeper
     end
 
     def write(message)
-      super(Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
+      json_message =
+        begin
+          Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5)
+        rescue JSON::GeneratorError
+          Oj.dump(message)
+        rescue => e
+          Oj.dump(e.message)
+        end
+
+      super(json_message << "\n")
     end
 
     private
