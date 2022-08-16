@@ -1,3 +1,7 @@
+# 2.2.2
+* Ensure additional fields are reset after logging
+* Let Oj fallback to :object mode for non-representable data
+
 # Unreleased
 * Add `#write` method support to all loggers
 
