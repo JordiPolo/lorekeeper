@@ -286,6 +286,17 @@ RSpec.describe Lorekeeper do
           logger.write(message)
           expect(io.received_message).to eq(message)
         end
+
+        context 'non-representable data' do
+          let(:message) { Float::NAN }
+
+          it 'falls back to :object mode if it can' do
+            logger.write(message)
+            # it's non NAN anymore since we're adding a new line to each message
+            #
+            expect(io.received_message).to eq Float::INFINITY
+          end
+        end
       end
 
       context 'Added some thread safe fields' do
