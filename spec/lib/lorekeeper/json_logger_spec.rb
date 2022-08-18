@@ -289,12 +289,24 @@ RSpec.describe Lorekeeper do
 
         context 'non-representable data' do
           let(:message) { { message: Float::NAN } }
+          let(:message_that_raises) { { message: 'I am raising an error' } }
+          let(:error_message) { 'Houston, we have a problem!' }
 
           it 'falls back to :object mode if it can' do
             logger.write(message)
             # it's non NAN anymore since we're adding a new line to each message
             #
             expect(io.received_message).to eq({ message: Float::INFINITY })
+          end
+
+          it 'serializes error message when it raises an exception' do
+            allow(Oj).to receive(:dump)
+              .with(message_that_raises, { cache_keys: true, cache_str: 5, mode: :compat })
+              .and_raise(error_message)
+            allow(Oj).to receive(:dump).with({ MESSAGE: error_message }).and_call_original
+
+            logger.write(message_that_raises)
+            expect(io.received_message).to eq({ MESSAGE: error_message })
           end
         end
       end
