@@ -57,6 +57,17 @@ RSpec.describe Lorekeeper do
         end
       end
 
+      describe 'Every _with_data logging method' do
+        let(:error_message) { 'Houston, we have a problem!' }
+
+        it 'resets extra_fields even if an exception is raised' do
+          allow(logger).to receive(:add).with(1, message, nil).and_raise(error_message)
+
+          expect { logger.send(:info_with_data, message, data) }.to raise_error(error_message)
+          expect(logger.state[:extra_fields]).to eq({})
+        end
+      end
+
       describe '#exception' do
         let(:exception_msg) { 'This is an exception' }
         let(:exception) { StandardError.new(exception_msg) }
