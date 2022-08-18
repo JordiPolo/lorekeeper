@@ -299,7 +299,7 @@ RSpec.describe Lorekeeper do
             expect(io.received_message).to eq({ message: Float::INFINITY })
           end
 
-          it 'serializes error message when it raises an exception' do
+          it 'serializes error message in case of raising an exception' do
             allow(Oj).to receive(:dump)
               .with(message_that_raises, { cache_keys: true, cache_str: 5, mode: :compat })
               .and_raise(error_message)
