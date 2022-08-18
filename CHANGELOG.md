@@ -2,8 +2,6 @@
 * Ensure additional fields are reset after logging
 * Let Oj fallback to :object mode for non-representable data
 * Fix SimpleLogger to handle non-String log messages
-
-# Unreleased
 * Run RuboCop checks on build and fix RuboCop offenses
 
 # 2.3.1
