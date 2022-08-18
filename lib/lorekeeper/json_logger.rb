@@ -102,7 +102,7 @@ module Lorekeeper
         rescue JSON::GeneratorError
           Oj.dump(message)
         rescue => e
-          Oj.dump(e.message)
+          Oj.dump({ MESSAGE: e.message })
         end
 
       super(json_message << "\n")
