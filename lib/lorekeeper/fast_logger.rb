@@ -5,9 +5,9 @@ require 'logger'
 module Lorekeeper
   # Very simple, very fast logger
   class FastLogger
-    include ::Logger::Severity  # contains the levels constants: DEBUG, ERROR, etc.
-    attr_accessor :level        # Current level, default: DEBUG
-    attr_accessor :formatter    # Just for compatibility with Logger, not used
+    include ::Logger::Severity # contains the levels constants: DEBUG, ERROR, etc.
+    attr_accessor :level,      # Current level, default: DEBUG
+      :formatter   # Just for compatibility with Logger, not used
 
     def debug?; level <= DEBUG; end
     def info?; level <= INFO; end
@@ -21,12 +21,12 @@ module Lorekeeper
       @file = file # We only keep this so we can inspect where we are sending the logs
     end
 
-    LOGGING_METHODS = [
-      :debug,
-      :info,
-      :warn,
-      :error,
-      :fatal
+    LOGGING_METHODS = %i[
+      debug
+      info
+      warn
+      error
+      fatal
     ].freeze
 
     METHOD_SEVERITY_MAP = {
@@ -56,7 +56,8 @@ module Lorekeeper
     # This is part of the standard Logger API, we need this to be compatible
     def add(severity, message_param = nil, progname = nil, &block)
       return true if severity < @level
-      message = (block && block.call) || message_param || progname
+
+      message = block&.call || message_param || progname
       log_data(severity, message.freeze)
     end
 
@@ -65,12 +66,12 @@ module Lorekeeper
     # To avoid needing to monkey-patch Lorekeeper just to get this method, we are adding a simple
     # non-functional version here.
     def silence_logger(&block)
-      yield if block_given?
+      yield if block
     end
 
     # activerecord-session_store v2 is now simply calling silence instead of silence_logger
     def silence(&block)
-      yield if block_given?
+      yield if block
     end
 
     # inherited classes probably want to reimplement this
@@ -81,8 +82,6 @@ module Lorekeeper
     def write(message)
       @iodevice.write(message)
     end
-
-    private
 
     require 'monitor'
     # Mutex to avoid broken lines when multiple threads access the log file
@@ -110,11 +109,12 @@ module Lorekeeper
       def to_iodevice(file)
         return nil unless file
 
-        iodevice = if file.respond_to?(:write) && file.respond_to?(:close)
-          file
-        else
-          open_logfile(file)
-        end
+        iodevice =
+          if file.respond_to?(:write) && file.respond_to?(:close)
+            file
+          else
+            open_logfile(file)
+          end
 
         iodevice.sync = true if iodevice.respond_to?(:sync=)
         iodevice
@@ -132,5 +132,7 @@ module Lorekeeper
         open_logfile(filename)
       end
     end
+
+    private_constant :LogDeviceMutex, :LogDevice
   end
 end

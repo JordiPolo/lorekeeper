@@ -1,3 +1,6 @@
+# Unreleased
+* Run RuboCop checks on build and fix RuboCop offenses
+
 # 2.3.1
 * Fix MultiLogger to not raise ArgumentError
 
