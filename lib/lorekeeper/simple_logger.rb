@@ -28,6 +28,7 @@ module Lorekeeper
     # \e[colorm sets a color \e[0m resets all properties
     def log_data(severity, message)
       color = SEVERITY_TO_COLOR_MAP[severity]
+      message = message.to_s
       write("\e[#{color}m#{message.gsub('\n', "\n").gsub('\t', "\t")}\e[0m\n")
     end
 
