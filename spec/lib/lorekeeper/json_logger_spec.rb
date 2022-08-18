@@ -288,13 +288,13 @@ RSpec.describe Lorekeeper do
         end
 
         context 'non-representable data' do
-          let(:message) { Float::NAN }
+          let(:message) { { message: Float::NAN } }
 
           it 'falls back to :object mode if it can' do
             logger.write(message)
             # it's non NAN anymore since we're adding a new line to each message
             #
-            expect(io.received_message).to eq Float::INFINITY
+            expect(io.received_message).to eq({ message: Float::INFINITY })
           end
         end
       end
