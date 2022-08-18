@@ -34,6 +34,24 @@ RSpec.describe Lorekeeper::MultiLogger do
       end
     end
 
+    context 'with data' do
+      it 'calls all log level methods of loggers' do
+        logger.add_logger(console_logger)
+        logger.add_logger(json_logger)
+
+        Lorekeeper::FastLogger::LOGGING_METHODS.each do |log_level|
+          logger.send("#{log_level}_with_data", message, { sum: 123 })
+
+          expect(io.received_message).to include("#{message}, data: {:sum=>123}")
+          expect(json_io.received_message).to include(
+            'message' => message,
+            'level' => log_level == :warn ? 'warning' : log_level.to_s,
+            'data' => { 'sum' => 123 }
+          )
+        end
+      end
+    end
+
     %i[
       current_fields state add_thread_unsafe_fields remove_thread_unsafe_fields add_fields remove_fields
     ].each do |method|
