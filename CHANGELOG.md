@@ -1,8 +1,14 @@
-# 2.2.2
+# 2.3.2
 * Ensure additional fields are reset after logging
 * Let Oj fallback to :object mode for non-representable data
 
 # Unreleased
+* Run RuboCop checks on build and fix RuboCop offenses
+
+# 2.3.1
+* Fix MultiLogger to not raise ArgumentError
+
+# 2.3.0
 * Add `#write` method support to all loggers
 
 # 2.2.1
