@@ -312,7 +312,7 @@ RSpec.describe Lorekeeper do
           it 'serializes error message in case of raising an exception' do
             Oj.default_options = { mode: :strict }
             logger.write(message)
-            expect(io.received_message).to eq("message" => "Failed to dump Float Object to JSON in strict mode.\n")
+            expect(io.received_message).to eq('message' => "Failed to dump Float Object to JSON in strict mode.\n")
           end
         end
       end
