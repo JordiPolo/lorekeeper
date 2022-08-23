@@ -96,10 +96,20 @@ module Lorekeeper
     end
 
     def write(message)
-      super(Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5) << "\n")
+      super(json_message(message) << "\n")
     end
 
     private
+
+    def json_message(message)
+      Oj.dump(message, mode: :compat, cache_keys: true, cache_str: 5)
+    rescue JSON::GeneratorError
+      begin
+        Oj.dump(message)
+      rescue => e
+        Oj.dump(MESSAGE => e.message)
+      end
+    end
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
@@ -131,6 +141,7 @@ module Lorekeeper
     def with_extra_fields(fields)
       state[:extra_fields] = fields
       yield
+    ensure
       state[:extra_fields] = {}
     end
 

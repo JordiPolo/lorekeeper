@@ -57,6 +57,17 @@ RSpec.describe Lorekeeper do
         end
       end
 
+      describe 'Every _with_data logging method' do
+        let(:error_message) { 'Houston, we have a problem!' }
+
+        it 'resets extra_fields even if an exception is raised' do
+          allow(logger).to receive(:add).with(1, message, nil).and_raise(error_message)
+
+          expect { logger.send(:info_with_data, message, data) }.to raise_error(error_message)
+          expect(logger.state[:extra_fields]).to eq({})
+        end
+      end
+
       describe '#exception' do
         let(:exception_msg) { 'This is an exception' }
         let(:exception) { StandardError.new(exception_msg) }
@@ -285,6 +296,24 @@ RSpec.describe Lorekeeper do
         it 'writes a parsable JSON message' do
           logger.write(message)
           expect(io.received_message).to eq(message)
+        end
+
+        context 'non-representable data' do
+          let(:message) { { message: Float::NAN } }
+
+          it 'falls back to :object mode if it can' do
+            Oj.default_options = { mode: :object }
+            logger.write(message)
+            # it's not a NAN anymore since we're adding a new line to each message
+            #
+            expect(io.received_message).to eq({ message: Float::INFINITY })
+          end
+
+          it 'serializes error message in case of raising an exception' do
+            Oj.default_options = { mode: :strict }
+            logger.write(message)
+            expect(io.received_message).to eq('message' => "Failed to dump Float Object to JSON in strict mode.\n")
+          end
         end
       end
 

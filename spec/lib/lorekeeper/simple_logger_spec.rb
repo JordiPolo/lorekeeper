@@ -23,6 +23,11 @@ RSpec.describe Lorekeeper::SimpleLogger do
       logger.log_data(:info, 'line: 5, column: 27\n\tat io.swagger.v3.parser')
       expect(io.received_message).to eq("\e[mline: 5, column: 27\n\tat io.swagger.v3.parser\e[0m\n")
     end
+
+    it 'works even if message is not a String' do
+      logger.log_data(:info, 404)
+      expect(io.received_message).to eq("\e[m404\e[0m\n")
+    end
   end
 
   describe '#inspect' do
