@@ -23,6 +23,16 @@ RSpec.describe Lorekeeper::FastLogger do
         described_class::ERROR =>
           { debug?: false, info?: false, warn?: false, error?: true, fatal?: true },
         described_class::FATAL =>
+          { debug?: false, info?: false, warn?: false, error?: false, fatal?: true },
+        :debug =>
+          { debug?: true, info?: true, warn?: true, error?: true, fatal?: true },
+        :info =>
+          { debug?: false, info?: true, warn?: true, error?: true, fatal?: true },
+        :warn =>
+          { debug?: false, info?: false, warn?: true, error?: true, fatal?: true },
+        :error =>
+          { debug?: false, info?: false, warn?: false, error?: true, fatal?: true },
+        :fatal =>
           { debug?: false, info?: false, warn?: false, error?: false, fatal?: true }
       }.freeze
     LEVEL_CHECKERS.each_pair do |log_level, checkers|
@@ -32,6 +42,32 @@ RSpec.describe Lorekeeper::FastLogger do
           expect(logger.send(method)).to eq(result)
         end
       end
+    end
+  end
+
+  describe '#with_level' do
+    it 'changes log level' do
+      expect(logger.level).to eq(described_class::DEBUG)
+
+      logger.with_level(:warn) do
+        expect(logger.level).to eq(described_class::WARN)
+
+        logger.with_level(:info) do
+          expect(logger.level).to eq(described_class::INFO)
+
+          Thread.new do
+            expect(logger.level).to eq(described_class::DEBUG)
+            logger.with_level(:error) do
+              expect(logger.level).to eq(described_class::ERROR)
+            end
+            expect(logger.level).to eq(described_class::DEBUG)
+          end.join
+
+          expect(logger.level).to eq(described_class::INFO)
+        end
+        expect(logger.level).to eq(described_class::WARN)
+      end
+      expect(logger.level).to eq(described_class::DEBUG)
     end
   end
 
@@ -98,6 +134,19 @@ RSpec.describe Lorekeeper::FastLogger do
     it 'writes message to io' do
       logger.write(message)
       expect(io.received_message).to eq(message)
+    end
+  end
+
+  describe '#coerce' do
+    Lorekeeper::FastLogger::METHOD_SEVERITY_MAP.each do |key, level|
+      it 'returns log level' do
+        logger.coerce(key)
+        expect(logger.coerce(key)).to eq(level)
+      end
+    end
+
+    it 'raises an exception when log level is invalid' do
+      expect { logger.coerce(:bad) }.to raise_error(ArgumentError, 'invalid log level: bad')
     end
   end
 end
