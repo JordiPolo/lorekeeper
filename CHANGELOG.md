@@ -1,3 +1,7 @@
+# 2.4.0
+* Add `#with_level` method support added to the stdlib's Logger in [#85](https://github.com/ruby/logger/issues/85)
+* Support symbol log level setting
+
 # 2.3.2
 * Ensure additional fields are reset after logging
 * Let Oj fallback to :object mode for non-representable data

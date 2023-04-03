@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require 'logger'
+require 'fiber'
 
 module Lorekeeper
   # Very simple, very fast logger
   class FastLogger
     include ::Logger::Severity # contains the levels constants: DEBUG, ERROR, etc.
-    attr_accessor :level,      # Current level, default: DEBUG
-      :formatter   # Just for compatibility with Logger, not used
+    attr_accessor :formatter   # Just for compatibility with Logger, not used
 
     def debug?; level <= DEBUG; end
     def info?; level <= INFO; end
@@ -19,6 +19,29 @@ module Lorekeeper
       @level = DEBUG
       @iodevice = LogDevice.new(file)
       @file = file # We only keep this so we can inspect where we are sending the logs
+      @level_override = {}
+    end
+
+    def level
+      @level_override[Fiber.current] || @level
+    end
+
+    def level=(severity)
+      @level = coerce(severity)
+    end
+
+    def with_level(severity)
+      prev = level
+      @level_override[Fiber.current] = coerce(severity)
+      begin
+        yield
+      ensure
+        if prev
+          @level_override[Fiber.current] = prev
+        else
+          @level_override.delete(Fiber.current)
+        end
+      end
     end
 
     LOGGING_METHODS = %i[
@@ -55,7 +78,7 @@ module Lorekeeper
 
     # This is part of the standard Logger API, we need this to be compatible
     def add(severity, message_param = nil, progname = nil, &block)
-      return true if severity < @level
+      return true if severity < level
 
       message = block&.call || message_param || progname
       log_data(severity, message.freeze)
@@ -81,6 +104,12 @@ module Lorekeeper
 
     def write(message)
       @iodevice.write(message)
+    end
+
+    def coerce(severity)
+      return severity if severity.is_a?(Integer)
+
+      METHOD_SEVERITY_MAP[severity] || raise(ArgumentError, "invalid log level: #{severity}")
     end
 
     require 'monitor'

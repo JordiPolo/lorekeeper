@@ -28,7 +28,7 @@ end
 
 def create_simple_logger
   logfile = Tempfile.new('my_test_log.log')
-  ::Logger.new(logfile.path)
+  Logger.new(logfile.path)
 end
 
 # This task is used to help development of Lorekeeper. Use together with rbtrace

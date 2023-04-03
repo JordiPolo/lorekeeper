@@ -52,6 +52,20 @@ RSpec.describe Lorekeeper::MultiLogger do
       end
     end
 
+    context 'with_level' do
+      it 'calls with_level method of loggers' do
+        logger.add_logger(console_logger)
+        logger.add_logger(json_logger)
+        logger.level = :info
+
+        logger.with_level(:debug) { logger.debug(message) }
+
+        expect(io.received_message).to include(message)
+        expect(json_io.received_message).to include('message' => message, 'level' => 'debug')
+        expect(logger.level).to eq(Lorekeeper::FastLogger::INFO)
+      end
+    end
+
     %i[
       current_fields state add_thread_unsafe_fields remove_thread_unsafe_fields add_fields remove_fields
     ].each do |method|
