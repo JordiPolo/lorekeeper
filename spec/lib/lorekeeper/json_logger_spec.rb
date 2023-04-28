@@ -84,6 +84,7 @@ RSpec.describe Lorekeeper do
         end
         let(:new_backtrace) do
           [
+            "/home/app/web/app/controllers/api/v2/users_controller.rb:39:in `show'",
             "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
             "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `block in run_callbacks'",
             "/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb:92:in
@@ -95,24 +96,30 @@ RSpec.describe Lorekeeper do
             "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
             '/ruby/2.5.0/gems/newrelic_rpm-5.7.0.350/lib/new_relic/agent/instrumentation/middleware_tracing.rb' \
             ":92:in `call'",
+            "/usr/local/rvm/rubies/ruby-2.7.6/lib/ruby/2.7.0/benchmark.rb:308:in `realtime'",
             '/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29' \
             ":in `block (3 levels) in call'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:51:in `trace!'",
             '/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:29' \
             ":in `block (2 levels) incall'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/zipkin_sender_base.rb:17:in `with_new_span'",
-            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:27:in `block in call'"
+            "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:27:in `block in call'",
+            "/ruby/2.5.0/gems/puma-5.3.2/lib/puma/configuration.rb:249:in `call'",
+            "/usr/lib/ruby/vendor_ruby/phusion_passenger/rack/thread_handler_extension.rb:107:in `process_request'"
           ]
         end
 
         before do
           exception.set_backtrace(backtrace)
           allow(Gem).to receive(:path).and_return(['/ruby/2.5.0'])
+          stub_const('RbConfig::CONFIG', { 'rubylibdir' => '/usr/local/rvm/rubies/ruby-2.7.6/lib/ruby/2.7.0' })
+          stub_const('Rails', double(root: '/home/app/web'))
         end
 
         context 'Logging just an exception' do
           let(:active_support_exception_v6) do
             [
+              "/app/controllers/api/v2/users_controller.rb:39:in `show'",
               "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
               "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
               "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'"
@@ -120,6 +127,7 @@ RSpec.describe Lorekeeper do
           end
           let(:active_support_exception_less_than_v6) do
             [
+              "/app/controllers/api/v2/users_controller.rb:39:in `show'",
               "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
               "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
               "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'"

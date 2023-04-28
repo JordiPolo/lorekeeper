@@ -113,7 +113,7 @@ module Lorekeeper
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
-    # Hardcording newrelic, active_support/callbacks and zipkin-tracer now here.
+    # Hardcording newrelic, active_support/callbacks, zipkin-tracer, web servers and stdlib now here.
     # In the future if this list grows, we may make it configurable.
     def clean_backtrace(backtrace)
       @backtrace_cleaner&.clean(backtrace) || backtrace
@@ -124,7 +124,9 @@ module Lorekeeper
 
       cleaner = ActiveSupport::BacktraceCleaner.new
       cleaner.remove_silencers!
-      cleaner.add_silencer { |line| line.match?(BLACKLISTED_FINGERPRINT) }
+      cleaner.add_filter   { |line| line.gsub(Rails.root.to_s, '') } if defined?(Rails.root)
+      cleaner.add_silencer { |line| line.match?(DENYLISTED_FINGERPRINT) }
+      cleaner.add_silencer { |line| line.start_with?(RbConfig::CONFIG['rubylibdir']) }
       cleaner
     end
 
@@ -136,7 +138,7 @@ module Lorekeeper
     EXCEPTION = 'exception'
     STACK = 'stack'
     DATA = 'data'
-    BLACKLISTED_FINGERPRINT = %r{newrelic_rpm|active_support/callbacks.rb|zipkin-tracer}.freeze
+    DENYLISTED_FINGERPRINT = %r{newrelic_rpm|active_support/callbacks.rb|zipkin-tracer|puma|phusion_passenger}.freeze
 
     def with_extra_fields(fields)
       state[:extra_fields] = fields
