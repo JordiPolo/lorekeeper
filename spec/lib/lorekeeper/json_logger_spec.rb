@@ -189,7 +189,23 @@ RSpec.describe Lorekeeper do
             expect(io.received_message).to eq(exception_data.merge('stack' => new_backtrace))
           end
 
-          context 'with LOREKEEPER_DENYLIST env ver' do
+          it 'drops backtrace lines after the last line of Rails app logs' do
+            hide_const('ActiveSupport::BacktraceCleaner')
+
+            exception.set_backtrace([
+              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
+              "/home/app/web/app/controllers/api/v2/users_controller.rb:39:in `show'",
+              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+              "/home/app/web/vendor/bundle/ruby/2.7.0/bin/rake:25:in `load'"
+            ])
+            logger.exception(exception)
+            expect(io.received_message).to eq(exception_data.merge('stack' => [
+              "/ruby/2.5.0/gems/activesupport-4.2.11/lib/active_support/callbacks.rb:121:in `instance_exec'",
+              "/app/controllers/api/v2/users_controller.rb:39:in `show'"
+            ]))
+          end
+
+          context 'with LOREKEEPER_DENYLIST env var' do
             before do
               allow(ENV).to receive(:key?).with('LOREKEEPER_DENYLIST').and_return(true)
               allow(ENV).to receive(:fetch).with('LOREKEEPER_DENYLIST').and_return(lorekeeper_denylist)

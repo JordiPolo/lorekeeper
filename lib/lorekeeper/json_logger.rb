@@ -118,8 +118,8 @@ module Lorekeeper
 
     # Some instrumentation libraries pollute the stacktrace and create a large output which may
     # cause problems with certain logging backends.
-    # Hardcording newrelic, active_support/callbacks, zipkin-tracer, web servers and stdlib now here.
-    # In the future if this list grows, we may make it configurable.
+    # Cleaner defaults to newrelic, active_support/callbacks, zipkin-tracer, opentelemetry, web servers,
+    # and stdlib now but can be configured by using LOREKEEPER_DENYLIST env var.
     def clean_backtrace(backtrace)
       backtrace = filter_rails_root_backtrace(backtrace)
       @backtrace_cleaner&.clean(backtrace) || backtrace
