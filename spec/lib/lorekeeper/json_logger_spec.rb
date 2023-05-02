@@ -105,13 +105,18 @@ RSpec.describe Lorekeeper do
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/zipkin_sender_base.rb:17:in `with_new_span'",
             "/ruby/2.5.0/gems/zipkin-tracer-0.47.3/lib/zipkin-tracer/rack/zipkin-tracer.rb:27:in `block in call'",
             "/ruby/2.5.0/gems/puma-5.3.2/lib/puma/configuration.rb:249:in `call'",
-            "/usr/lib/ruby/vendor_ruby/phusion_passenger/rack/thread_handler_extension.rb:107:in `process_request'"
+            "/usr/lib/ruby/vendor_ruby/phusion_passenger/rack/thread_handler_extension.rb:107:in `process_request'",
+            "/ruby/2.5.0/gems/opentelemetry-api-1.0.1/lib/opentelemetry/trace/tracer.rb:29:in `block in in_span'",
+            "/home/app/web/app/controllers/api/v2/users_controller.rb:39:in `show'",
+            "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+            "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+            "/home/app/web/vendor/bundle/ruby/2.7.0/bin/rake:25:in `load'"
           ]
         end
 
         before do
           exception.set_backtrace(backtrace)
-          allow(Gem).to receive(:path).and_return(['/ruby/2.5.0'])
+          allow(Gem).to receive(:path).and_return(['/ruby/2.5.0', '/home/app/web/vendor/bundle/ruby/2.7.0'])
           stub_const('RbConfig::CONFIG', { 'rubylibdir' => '/usr/local/rvm/rubies/ruby-2.7.6/lib/ruby/2.7.0' })
           stub_const('Rails', double(root: '/home/app/web'))
         end
@@ -122,7 +127,8 @@ RSpec.describe Lorekeeper do
               "/app/controllers/api/v2/users_controller.rb:39:in `show'",
               "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
               "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-              "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'"
+              "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+              "/app/controllers/api/v2/users_controller.rb:39:in `show'"
             ]
           end
           let(:active_support_exception_less_than_v6) do
@@ -130,8 +136,12 @@ RSpec.describe Lorekeeper do
               "/app/controllers/api/v2/users_controller.rb:39:in `show'",
               "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
               "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
-              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'"
+              "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+              "/app/controllers/api/v2/users_controller.rb:39:in `show'"
             ]
+          end
+          let(:no_noise_backtrace) do
+            ActiveSupport::VERSION::MAJOR < 6 ? active_support_exception_less_than_v6 : active_support_exception_v6
           end
 
           it 'Falls back to ERROR if if the specified level is not recognized' do
@@ -164,29 +174,55 @@ RSpec.describe Lorekeeper do
             ])
           end
 
-          it 'Does not log Newrelic instrumentation information and active_support callbacks' do
+          it 'Does not log the lines matched with the denylist' do
             exception.set_backtrace(new_backtrace)
             logger.exception(exception)
-
-            no_newrelic_backtrace =
-              if ActiveSupport::VERSION::MAJOR < 6
-                active_support_exception_less_than_v6
-              else
-                active_support_exception_v6
-              end
-            expected = exception_data.merge('stack' => no_newrelic_backtrace)
-
-            expect(io.received_message).to eq(expected)
+            expect(io.received_message).to eq(exception_data.merge('stack' => no_noise_backtrace))
           end
 
-          it 'Logs all backtraces when ActiveSupport::BacktraceCleaner is not defined' do
+          it 'Logs all backtraces when ActiveSupport::BacktraceCleaner and Rails.root are not defined' do
             hide_const('ActiveSupport::BacktraceCleaner')
+            hide_const('Rails')
 
             exception.set_backtrace(new_backtrace)
             logger.exception(exception)
-            expected = exception_data.merge('stack' => new_backtrace)
+            expect(io.received_message).to eq(exception_data.merge('stack' => new_backtrace))
+          end
 
-            expect(io.received_message).to eq(expected)
+          context 'with LOREKEEPER_DENYLIST env ver' do
+            before do
+              allow(ENV).to receive(:key?).with('LOREKEEPER_DENYLIST').and_return(true)
+              allow(ENV).to receive(:fetch).with('LOREKEEPER_DENYLIST').and_return(lorekeeper_denylist)
+            end
+            let(:lorekeeper_denylist) { 'newrelic_rpm, active_support/callbacks.rb, zipkin-tracer, puma' }
+            let(:active_support_exception_v6) do
+              [
+                "/app/controllers/api/v2/users_controller.rb:39:in `show'",
+                "actionpack (4.2.11) lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                "actionpack (4.2.11) lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+                "/usr/lib/ruby/vendor_ruby/phusion_passenger/rack/thread_handler_extension.rb:107:in `process_request'",
+                "opentelemetry-api (1.0.1) lib/opentelemetry/trace/tracer.rb:29:in `block in in_span'",
+                "/app/controllers/api/v2/users_controller.rb:39:in `show'"
+              ]
+            end
+            let(:active_support_exception_less_than_v6) do
+              [
+                "/app/controllers/api/v2/users_controller.rb:39:in `show'",
+                "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/cookies.rb:560:in `call'",
+                "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:29:in `block in call'",
+                "/ruby/2.5.0/gems/actionpack-4.2.11/lib/action_dispatch/middleware/callbacks.rb:27:in `call'",
+                "/usr/lib/ruby/vendor_ruby/phusion_passenger/rack/thread_handler_extension.rb:107:in `process_request'",
+                "/ruby/2.5.0/gems/opentelemetry-api-1.0.1/lib/opentelemetry/trace/tracer.rb:29:in `block in in_span'",
+                "/app/controllers/api/v2/users_controller.rb:39:in `show'"
+              ]
+            end
+
+            it 'Does not log the lines matched with the denylist' do
+              exception.set_backtrace(new_backtrace)
+              logger.exception(exception)
+              expect(io.received_message).to eq(exception_data.merge('stack' => no_noise_backtrace))
+            end
           end
         end
 
