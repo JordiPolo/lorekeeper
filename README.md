@@ -20,6 +20,15 @@ bundle
 ```
 
 
+## Configuration
+
+Configuration is set through environment variables.
+
+- `LOREKEEPER_DENYLIST`
+  - A comma separated list of keywords/phrases that will be excluded from the clean backtrace.
+  - default: `newrelic_rpm, active_support/callbacks.rb, zipkin-tracer, puma, phusion_passenger, opentelemetry`
+
+
 ## Usage
 
 ### Normal logging methods

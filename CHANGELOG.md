@@ -1,3 +1,6 @@
+# 2.5.0
+* Update the backtrace cleaner in JSONLogger to remove web server and stdlib lines, and to strip the Rails.root prefix
+
 # 2.4.0
 * Add `#with_level` method support added to the stdlib's Logger in [#85](https://github.com/ruby/logger/issues/85)
 * Support symbol log level setting
