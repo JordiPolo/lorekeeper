@@ -10,7 +10,7 @@ When used without extra fields it outputs 20% faster than the standard Logger fo
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'lorekeeper', '~> 1.7'
+gem 'lorekeeper', '~> 2.0'
 ```
 
 And then execute:
@@ -209,6 +209,14 @@ rescue => e
 end
 ```
 
+
+### Backtrace Cleaner
+
+The backtrace cleaner can be used independently:
+
+```ruby
+Lorekeeper::BacktraceCleaner.instance.clean(backtrace)
+```
 
 
 ## License
