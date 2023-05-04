@@ -1,3 +1,6 @@
+# 2.6.0
+* Expose Lorekeeper::BacktraceCleaner
+
 # 2.5.0
 * Update the backtrace cleaner in JSONLogger to remove web server and stdlib lines, and to strip the Rails.root prefix
 
