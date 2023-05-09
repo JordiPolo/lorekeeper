@@ -100,6 +100,10 @@ RSpec.describe Lorekeeper do
           ])
         end
 
+        it 'returns an empty array when nil is passed' do
+          expect(instance.clean(nil)).to eq([])
+        end
+
         context 'with LOREKEEPER_DENYLIST env var' do
           before do
             allow(ENV).to receive(:key?).with('LOREKEEPER_DENYLIST').and_return(true)
