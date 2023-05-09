@@ -15,6 +15,8 @@ module Lorekeeper
     end
 
     def clean(backtrace)
+      return [] unless backtrace.is_a?(Array)
+
       backtrace = filter_rails_root_backtrace(backtrace)
       @backtrace_cleaner&.clean(backtrace) || backtrace
     end

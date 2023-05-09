@@ -1,3 +1,6 @@
+# 2.6.1
+* Fix Lorekeeper::BacktraceCleaner#clean to not raise when a non-array value is passed
+
 # 2.6.0
 * Expose Lorekeeper::BacktraceCleaner
 
