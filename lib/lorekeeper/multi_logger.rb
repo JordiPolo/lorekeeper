@@ -29,8 +29,8 @@ module Lorekeeper
 
     def write(*args); call_loggers(:write, *args); end
 
-    def respond_to?(method, all_included: false)
-      @loggers.all? { |logger| logger.respond_to?(method, all_included) }
+    def respond_to?(method, include_all=false)
+      @loggers.all? { |logger| logger.respond_to?(method, include_all) }
     end
 
     def call_loggers(method, *args, &block)

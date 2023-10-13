@@ -1,3 +1,6 @@
+# 2.6.2
+* Fix respond_to? method signature
+
 # 2.6.1
 * Fix Lorekeeper::BacktraceCleaner#clean to not raise when a non-array value is passed
 
