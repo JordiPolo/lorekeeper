@@ -18,15 +18,15 @@ jobs:
         rails: ['5.2.7', '6.0.4', '6.1.7', '7.0.8', '7.1.1']
         include:
           - rails: '4.0.1'
-            ruby-version: '2.5'
+            ruby-version: '2.7'
           - rails: '4.1.1'
-            ruby-version: '2.5'
+            ruby-version: '2.7'
           - rails: '4.2.1'
-            ruby-version: '2.5'
+            ruby-version: '2.7'
           - rails: '5.0.1'
-            ruby-version: '2.6'
+            ruby-version: '2.7'
           - rails: '5.1.1'
-            ruby-version: '2.6'
+            ruby-version: '2.7'
 
 
     steps:
