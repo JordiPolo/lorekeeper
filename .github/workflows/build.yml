@@ -14,27 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby-version: ['2.7', '3.0', '3.1', '3.2', '3.3']
+        ruby: ['2.7', '3.0', '3.1', '3.2', '3.3']
         rails: ['5.2.7', '6.0.4', '6.1.7', '7.0.8', '7.1.1']
         include:
           - rails: '4.0.1'
-            ruby-version: '2.7'
+            ruby: '2.7'
           - rails: '4.1.1'
-            ruby-version: '2.7'
+            ruby: '2.7'
           - rails: '4.2.1'
-            ruby-version: '2.7'
+            ruby: '2.7'
           - rails: '5.0.1'
-            ruby-version: '2.7'
+            ruby: '2.7'
           - rails: '5.1.1'
-            ruby-version: '2.7'
-
+            ruby: '2.7'
 
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby-version }}
+        ruby-version: ${{ matrix.ruby }}
+        rails-version: ${{ matrix.rails }} # for the cache key
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run rubocop
       run: bundle exec rubocop
