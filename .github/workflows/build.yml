@@ -34,7 +34,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        rails-version: ${{ matrix.rails }} # for the cache key
+        cache-version: rails-${{ matrix.rails }} # for the cache key
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
     - name: Run rubocop
       run: bundle exec rubocop
