@@ -45,11 +45,13 @@ RSpec.describe Lorekeeper do
           "/home/app/web/vendor/bundle/ruby/2.7.0/bin/rake:25:in `load'"
         ]
       end
+      let(:new_backtrace_location) { new_backtrace.map { |bt| BacktraceLocation.new('', '', bt) } }
 
       before do
         allow(Gem).to receive(:path).and_return(['/ruby/2.5.0', '/home/app/web/vendor/bundle/ruby/2.7.0'])
         stub_const('RbConfig::CONFIG', { 'rubylibdir' => '/usr/local/rvm/rubies/ruby-2.7.6/lib/ruby/2.7.0' })
         stub_const('Rails', double(root: '/home/app/web'))
+        stub_const('BacktraceLocation', Struct.new(:path, :lineno, :to_s)) # https://github.com/rails/rails/blob/v7.1.2/activesupport/lib/active_support/syntax_error_proxy.rb#L15
       end
 
       context 'Logging just an exception' do
@@ -75,11 +77,17 @@ RSpec.describe Lorekeeper do
           ActiveSupport::VERSION::MAJOR < 6 ? active_support_exception_less_than_v6 : active_support_exception_v6
         end
 
-        it 'Does not log the lines matched with the denylist' do
+        it 'does not log the lines matched with the denylist' do
           expect(instance.clean(new_backtrace)).to eq(no_noise_backtrace)
         end
 
-        it 'Logs all backtraces when ActiveSupport::BacktraceCleaner and Rails.root are not defined' do
+        context 'with backtrace location' do
+          it 'does not log the lines matched with the denylist' do
+            expect(instance.clean(new_backtrace_location)).to eq(no_noise_backtrace)
+          end
+        end
+
+        it 'logs all backtraces when ActiveSupport::BacktraceCleaner and Rails.root are not defined' do
           hide_const('ActiveSupport::BacktraceCleaner')
           hide_const('Rails')
 

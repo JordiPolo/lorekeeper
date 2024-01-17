@@ -28,10 +28,10 @@ module Lorekeeper
     # Delegates methods to the existing Logger instance
     # We are extending the logger API with methods error_with_data, etc
     LOGGING_METHODS.each do |method_name|
-      define_method "#{method_name}_with_data", ->(message_param = nil, data = {}, &block) {
+      define_method :"#{method_name}_with_data", ->(message_param = nil, data = {}, &block) {
         return true if METHOD_SEVERITY_MAP[method_name] < @level
 
-        extra_fields = { DATA => (data || {}) }
+        extra_fields = { DATA => data || {} }
         with_extra_fields(extra_fields) do
           add(METHOD_SEVERITY_MAP[method_name], message_param, nil, &block)
         end
@@ -87,7 +87,7 @@ module Lorekeeper
       else
         log_data(METHOD_SEVERITY_MAP[:warn], 'Logger exception called without exception class.')
         message = "#{exception.class}: #{exception.inspect} #{param_message}"
-        with_extra_fields(DATA => (param_data || {})) { log_data(log_level, message) }
+        with_extra_fields(DATA => param_data || {}) { log_data(log_level, message) }
       end
     end
 

@@ -37,7 +37,7 @@ RSpec.describe Lorekeeper do
           expect(io.received_message.keys[0..2]).to eq(%w[timestamp message level])
         end
         it "Outputs the correct format for #{method}_with_data" do
-          logger.send("#{method}_with_data", message, data)
+          logger.send(:"#{method}_with_data", message, data)
           expect(io.received_message).to eq(expected_data.merge('level' => level_name.call(method)))
         end
       end
@@ -396,7 +396,7 @@ RSpec.describe Lorekeeper do
         end
         it "No data is written to the device for #{method}_with_data" do
           expect(io).not_to receive(:write)
-          logger.send("#{method}_with_data", message, data)
+          logger.send(:"#{method}_with_data", message, data)
         end
       end
     end

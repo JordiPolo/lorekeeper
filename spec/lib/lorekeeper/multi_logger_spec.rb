@@ -40,7 +40,7 @@ RSpec.describe Lorekeeper::MultiLogger do
         logger.add_logger(json_logger)
 
         Lorekeeper::FastLogger::LOGGING_METHODS.each do |log_level|
-          logger.send("#{log_level}_with_data", message, { sum: 123 })
+          logger.send(:"#{log_level}_with_data", message, { sum: 123 })
 
           expect(io.received_message).to include("#{message}, data: {:sum=>123}")
           expect(json_io.received_message).to include(

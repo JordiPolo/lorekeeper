@@ -14,15 +14,19 @@ AllCops:
   #
     - 'vendor/bundle/**/*'
 
-Lint/ConstantDefinitionInBlock:
-  Exclude:
-    - 'spec/**/*'
-
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
+
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - 'spec/**/*'
+
+Lint/StructNewOverride:
+  Exclude:
+    - spec/lib/lorekeeper/backtrace_cleaner_spec.rb
 
 Metrics/ParameterLists:
   CountKeywordArgs: false

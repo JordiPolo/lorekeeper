@@ -38,6 +38,7 @@ module Lorekeeper
       last_index = nil
       result = []
       backtrace.each_with_index do |line, idx|
+        line = line.to_s
         if line.start_with?(@rails_root) && @gem_path.none? { |path| line.start_with?(path) }
           result << line[@rails_root_size..]
           last_index = idx

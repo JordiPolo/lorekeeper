@@ -1,3 +1,6 @@
+# 2.6.3
+* Fix Lorekeeper::BacktraceCleaner to support BacktraceLocation
+
 # 2.6.2
 * Fix respond_to? method signature
 
