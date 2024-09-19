@@ -1,3 +1,6 @@
+# 2.6.4
+* Reorder the exception fields to have the `data` field before the `exception` field
+
 # 2.6.3
 * Fix Lorekeeper::BacktraceCleaner to support BacktraceLocation
 
