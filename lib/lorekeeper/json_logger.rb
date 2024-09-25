@@ -10,7 +10,7 @@ module Lorekeeper
       reset_state
       @base_fields = { TIMESTAMP => '', MESSAGE => '', LEVEL => '' }
 
-      super(file)
+      super
     end
 
     def current_fields
@@ -77,10 +77,11 @@ module Lorekeeper
       if exception.is_a?(Exception)
         backtrace = clean_backtrace(exception.backtrace || [])
         exception_fields = {
+          DATA => param_data,
           EXCEPTION => "#{exception.class}: #{exception.message}",
           STACK => backtrace
         }
-        exception_fields[DATA] = param_data if param_data
+        exception_fields.compact!
 
         message = param_message || exception.message
         with_extra_fields(exception_fields) { log_data(log_level, message) }
